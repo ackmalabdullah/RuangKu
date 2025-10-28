@@ -1,0 +1,307 @@
+/* --- Global Styles & Variables --- */
+:root {
+    --primary-color: #3B5998; /* Warna biru tua dari CTA */
+    --highlight-color: #4D9DE0; /* Warna biru terang pada kartu */
+    --dark-grey: #333333;
+    --light-grey: #F4F7F6;
+    --text-color: #555;
+    --white-color: #FFFFFF;
+    --box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--light-grey);
+    color: var(--text-color);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* --- Header / Navbar --- */
+.header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 100;
+    padding: 20px 0;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--white-color);
+    text-decoration: none;
+}
+
+.nav-menu {
+    display: flex;
+    list-style: none;
+    gap: 40px;
+}
+
+.nav-link {
+    color: var(--white-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.nav-link:hover {
+    color: var(--highlight-color);
+}
+
+.nav-avatar {
+    width: 40px;
+    height: 40px;
+    background-color: #ccc;
+    border-radius: 50%;
+}
+
+/* --- Hero Section (Dengan Overlay Profesional) --- */
+
+.hero {
+    position: relative; /* WAJIB ADA untuk menampung pseudo-element */
+    height: 70vh; /* Sesuaikan tinggi sesuai kebutuhan */
+    min-height: 600px;
+    background-image: url('../img/gedungti.jpg'); /* Ganti dengan path gambar Anda yang benar */
+    background-size: cover;
+    background-position: center;
+    
+    /* Atur padding agar konten di dalamnya tidak mentok ke atas */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding-bottom: 80px;
+}
+
+/* INI BAGIAN PALING PENTINGNYA */
+.hero::before {
+    content: ''; /* Pseudo-element wajib punya content */
+    position: absolute; /* Melayang di atas parent-nya (.hero) */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1; /* Berada di antara background gambar dan konten teks */
+    
+    /* Lapisan gradient yang membuat efek gelap di atas gambar */
+    background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.2) 40%, transparent 80%);
+}
+
+/* Pastikan konten hero berada di atas lapisan overlay */
+.hero-content {
+    position: relative;
+    z-index: 2; /* Harus lebih tinggi dari z-index ::before */
+    color: white;
+}
+
+.hero-content {
+    color: var(--white-color);
+}
+
+.hero-content p {
+    font-size: 1.2rem;
+}
+
+.hero-content h1 {
+    font-size: 2.8rem;
+    margin-top: 10px;
+    line-height: 1.3;
+}
+
+.booking-form-container {
+    position: absolute;
+    bottom: -60px; /* Setengah tinggi form */
+    width: 80%;
+    max-width: 900px;
+    background-color: var(--white-color);
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: var(--box-shadow);
+}
+
+.booking-form {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 20px;
+}
+
+.form-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+.form-group input, .form-group select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.btn {
+    padding: 12px 25px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-check {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+}
+
+.btn-check:hover {
+    background-color: var(--secondary-color);
+}
+
+
+/* --- Ruangan Favorit Section --- */
+.favorite-rooms {
+    padding: 150px 0 60px; /* Padding top untuk memberi ruang form */
+    text-align: center;
+}
+
+.favorite-rooms h2 {
+    font-size: 2rem;
+    margin-bottom: 40px;
+    color: var(--dark-grey);
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.card {
+    background: var(--white-color);
+    border-radius: 15px;
+    box-shadow: var(--box-shadow);
+    text-align: left;
+    overflow: hidden;
+}
+
+.card-highlighted {
+    border: 3px solid var(--highlight-color);
+}
+
+.card-image {
+    height: 180px;
+    background-color: #e0e0e0; /* Placeholder for image */
+}
+
+.card-body {
+    padding: 25px;
+}
+
+.card-body h3 {
+    margin-bottom: 15px;
+    color: var(--dark-grey);
+}
+
+.card-body p {
+    margin-bottom: 5px;
+    line-height: 1.6;
+}
+
+.btn-details {
+    display: inline-block;
+    margin-top: 20px;
+    background-color: var(--light-grey);
+    color: var(--text-color);
+    border: 1px solid #ddd;
+}
+
+.btn-details:hover {
+    background-color: #ddd;
+}
+
+/* --- CTA Section --- */
+.cta {
+    padding: 40px 0;
+}
+
+.cta-container {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    border-radius: 15px;
+    padding: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cta-text p {
+    font-size: 1.2rem;
+}
+
+.cta-text h2 {
+    font-size: 2.5rem;
+    margin-top: 5px;
+}
+
+.btn-contact {
+    background-color: var(--white-color);
+    color: var(--primary-color);
+    font-size: 1rem;
+    padding: 15px 30px;
+}
+
+.btn-contact:hover {
+    background-color: var(--light-grey);
+}
+
+
+/* --- Scroll to Top Button --- */
+.scroll-to-top {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    text-decoration: none;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    transition: opacity 0.3s, transform 0.3s;
+}
+
+.scroll-to-top:hover {
+    transform: translateY(-5px);
+}

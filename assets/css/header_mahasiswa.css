@@ -1,0 +1,54 @@
+body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #f4f4f9;
+    }
+    
+    /* Style untuk Header Navigasi */
+    .navbar {
+      display: flex;
+      justify-content: space-between; /* Logo di kiri, menu di kanan */
+      align-items: center;
+      background-color: #ffffff;
+      padding: 1rem 2rem;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    .navbar .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #333;
+      text-decoration: none;
+    }
+    
+    .navbar nav ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+    }
+    
+    .navbar nav li {
+      margin-left: 25px; /* Jarak antar menu */
+    }
+    
+    .navbar nav a {
+      text-decoration: none;
+      color: #555;
+      font-weight: 500;
+      padding-bottom: 5px;
+    }
+    
+    /* Style untuk menu yang 'aktif' */
+    .navbar nav a.active {
+      color: #007bff;
+      font-weight: bold;
+      border-bottom: 2px solid #007bff;
+    }
+
+    /* Kontainer untuk isi halaman */
+    .container {
+      max-width: 1200px;
+      margin: 20px auto; /* Jarak atas/bawah 20px, auto kiri/kanan */
+      padding: 0 2rem;
+    }

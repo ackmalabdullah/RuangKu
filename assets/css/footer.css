@@ -1,0 +1,91 @@
+/* --- Footer (VERSI BARU - LEBIH TIPIS DAN RINGKAS) --- */
+.footer {
+    background-color: #2D4373;
+    color: #d1d1d1;
+    /* PADDING UTAMA DIKECILKAN secara signifikan */
+    padding: 30px 0 20px 0; 
+    line-height: 1.5; /* Line height juga dikurangi sedikit */
+    font-size: 0.85rem; /* Ukuran font dasar dikecilkan lagi */
+}
+
+.footer-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 40px;
+    /* Jarak ke garis bawah dikurangi */
+    padding-bottom: 20px; 
+}
+
+.footer-col {
+    flex: 2;
+}
+
+.footer-col:last-child {
+    flex: 1;
+}
+
+.footer-col h4 {
+    color: #FFFFFF;
+    /* Jarak dari heading ke list di bawahnya dikurangi */
+    margin-bottom: 18px; 
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.footer-col ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.footer-col ul li {
+    /* Jarak antar item list dikurangi */
+    margin-bottom: 12px; 
+    display: flex;
+    align-items: flex-start;
+}
+
+.footer-col ul li i {
+    color: #FFFFFF;
+    width: 20px;
+    margin-right: 15px;
+    font-size: 0.9rem; /* Ikon juga sedikit dikecilkan */
+    margin-top: 2px; /* Disesuaikan lagi */
+    text-align: center;
+}
+
+.footer-bottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    /* Jarak dari garis atas ke copyright dikurangi */
+    padding-top: 20px; 
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.copyright-text {
+    color: #a0a0a0;
+    font-size: 0.8rem; /* Lebih kecil lagi */
+}
+
+/* --- Scroll to Top Button (Ukuran Tetap Kecil) --- */
+.scroll-to-top {
+    position: relative; 
+    width: 36px;
+    height: 36px;
+    background-color: #d1d1d1;
+    color: #2D4373;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.scroll-to-top:hover {
+    background-color: #FFFFFF;
+    transform: translateY(-3px);
+}

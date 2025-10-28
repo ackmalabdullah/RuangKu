@@ -1,0 +1,84 @@
+/*
+ * File: assets/css/header_landing.css
+ * Styling untuk Header Landing Page
+ */
+
+/* Variabel Warna (Praktik yang Baik) */
+:root {
+    --white-color: #FFFFFF;
+    --hover-color: #e0e0e0; /* Warna saat link di-hover */
+}
+
+/* Mengatur font dasar dari Google Fonts yang sudah Anda impor */
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Styling untuk container agar konten tidak terlalu lebar */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* --- Styling Header Utama (VERSI BENAR) --- */
+.header {
+    position: absolute; /* Tetap absolute agar melayang */
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    padding: 20px 0;
+    transition: background-color 0.3s ease;
+    
+    /* HAPUS 'background: linear-gradient(...)' DARI SINI */
+    /* Biarkan header ini transparan sepenuhnya */
+    background: transparent; 
+}
+
+/* --- Styling Navbar --- */
+.navbar {
+    display: flex; /* Menggunakan Flexbox untuk alignment */
+    justify-content: space-between; /* Mendorong item ke sisi: logo kiri, menu tengah, avatar kanan */
+    align-items: center; /* Menyelaraskan semua item secara vertikal di tengah */
+}
+
+/* --- Styling Logo --- */
+.nav-logo {
+    /* ...properti lain... */
+    color: var(--white-color);
+    text-decoration: none;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7); /* Tambahkan ini */
+}
+
+/* --- Styling Menu Navigasi --- */
+.nav-link {
+    /* ...properti lain... */
+    color: var(--white-color);
+    text-decoration: none;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7); /* Tambahkan ini */
+}
+
+/* --- Styling Menu Navigasi --- */
+.nav-menu {
+    list-style: none; /* Menghilangkan bullet points dari <ul> */
+    display: flex; /* Membuat item menu berjajar horizontal */
+    gap: 45px; /* Memberi jarak antar item menu */
+    margin: 0; /* Menghilangkan margin default dari <ul> */
+    padding: 0;
+}
+
+.nav-link:hover {
+    color: var(--hover-color); /* Mengubah warna saat kursor mouse di atasnya */
+}
+
+/* --- Styling Avatar --- */
+.nav-avatar {
+    width: 45px;
+    height: 45px;
+    background-color: #d1d1d1; /* Warna placeholder abu-abu */
+    border-radius: 50%; /* Membuatnya menjadi lingkaran sempurna */
+    cursor: pointer; /* Mengubah kursor menjadi tangan saat di-hover */
+}

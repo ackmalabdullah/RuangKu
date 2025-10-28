@@ -1,0 +1,169 @@
+/* Pengaturan dasar */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    /* Latar belakang gambar gedung */
+    background-image: url('../img/gedungti.jpg');
+    background-size: cover;
+    background-position: center;
+}
+
+/* Kotak form login (persegi panjang) */
+.login-container {
+    /* Efek Kaca (Frosted Glass) */
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(5px); /* Efek blur */
+    
+    padding: 3rem;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    width: 100%;
+
+    /* --- INI PERUBAHANNYA --- */
+    /* Dibuat lebih lebar (persegi panjang) tapi tidak terlalu besar */
+    max-width: 500px; 
+    /* --- --- */
+
+    text-align: center;
+}
+
+/* Styling Logo */
+.logo-container {
+    margin-bottom: 1.5rem;
+}
+
+.logo-container img {
+    max-width: 150px;
+    height: auto;
+}
+
+/* Styling Teks Judul */
+.login-form h2 {
+    margin-bottom: 0.5rem;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.login-form p {
+    margin-bottom: 2rem;
+    color: #666;
+    font-size: 0.95rem;
+}
+
+/* Grup input */
+.input-group {
+    margin-bottom: 1.5rem;
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Styling untuk Input dengan Icon */
+.input-with-icon {
+    position: relative;
+}
+
+.input-with-icon i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #aaa;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 0.8rem 1rem 0.8rem 2.5rem; /* Padding kiri untuk icon */
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
+    transition: all 0.3s ease;
+}
+
+/* Efek "Focus" yang Profesional */
+.input-group input:focus {
+    outline: none;
+    border-color: #34495e;
+    box-shadow: 0 0 0 3px rgba(52, 73, 94, 0.1); /* Efek glow */
+}
+
+.input-group input::placeholder {
+    color: #bbb;
+}
+
+/* Opsi "Ingat Saya" dan "Lupa Password" */
+.options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+    color: #555;
+}
+
+.remember-me input {
+    margin-right: 0.5rem;
+}
+
+/* Tombol dan Link */
+.forgot-password, .support-link a {
+    color: #34495e;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.forgot-password:hover, .support-link a:hover {
+    text-decoration: underline;
+}
+
+.login-button {
+    width: 100%;
+    padding: 0.9rem;
+    border: none;
+    border-radius: 8px;
+    background-color: #34495e; /* Warna gelap seperti di gambar asli */
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.login-button:hover {
+    background-color: #2c3e50;
+}
+
+.support-link {
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+/* Penyesuaian untuk layar HP yang lebih kecil */
+@media (max-width: 520px) { /* Disesuaikan dengan max-width baru */
+    .login-container {
+        padding: 2rem;
+        margin: 1rem; /* Beri sedikit jarak dari tepi layar */
+    }
+}
