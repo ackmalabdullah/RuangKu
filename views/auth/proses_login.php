@@ -54,8 +54,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if ($role == 'admin') {
                 header("Location: ../admin/dashboard/dashboard.php");
                 exit;
-            } elseif ($role == 'pengelola') {
-                header("Location: ../pengelola/dashboard.php");
+            } elseif ($role == 'pengelola_ruangan') {
+                header("Location: ../pengelola/dashboard/dashboard.php");
+                exit;
+            } elseif ($role == 'pengelola_lab') {
+                header("Location: ../pengelola/dashboard/dashboard.php");
                 exit;
             } else {
                 header("Location: login.php?error=Role tidak dikenali");
