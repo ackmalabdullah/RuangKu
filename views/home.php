@@ -7,7 +7,7 @@ require '../partials/header_landing.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PinruLab JTI - Booking Ruangan</title>
+    <title>RuangKU JTI - Booking Ruangan</title>
     <link rel="stylesheet" href="../assets/css/home.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,7 +19,7 @@ require '../partials/header_landing.php';
     <main>
         <section class="hero">
             <div class="hero-content">
-                <p>Welcome To PinruLab</p>
+                <p>Welcome To RuangKU</p>
                 <h1>Online Booking Ruangan dan Lab<br>Jurusan Teknologi Informasi</h1>
             </div>
             <div class="booking-form-container">

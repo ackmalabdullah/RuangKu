@@ -62,7 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // 11. Redirect ke dashboard mahasiswa
         $stmt->close();
         $conn->close();
-        header("Location: ../mahasiswa/dashboard.php");
+        header("Location: ../mahasiswa/dashboard/dashboard.php");
         exit;
 
     } catch (Exception $e) {

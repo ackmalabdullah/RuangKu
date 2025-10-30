@@ -52,7 +52,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $role = $user['role'];
 
             if ($role == 'admin') {
-                header("Location: ../admin/dashboard.php");
+                header("Location: ../admin/dashboard/dashboard.php");
                 exit;
             } elseif ($role == 'pengelola') {
                 header("Location: ../pengelola/dashboard.php");
