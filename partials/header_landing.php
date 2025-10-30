@@ -6,7 +6,7 @@ $base_path = "/APKPINRULAB";
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PinruLab JTI - Booking Ruangan</title>
+    <title>RuangKu JTI - Booking Ruangan</title>
 
     <link rel="stylesheet" href="../assets/css/footer.css">
     <link rel="stylesheet" href="../assets/css/header_landing.css">
@@ -23,7 +23,7 @@ $base_path = "/APKPINRULAB";
     <header class="header">
         <div class="container">
             <nav class="navbar">
-                <a href="#" class="nav-logo">PINRULAB JTI</a>
+                <a href="#" class="nav-logo">RuangKu JTI</a>
                 <ul class="nav-menu">
                     <li class="nav-item"><a href="#" class="nav-link">Home</a></li>
                     <li class="nav-item"><a href="#" class="nav-link">Ruangan</a></li>

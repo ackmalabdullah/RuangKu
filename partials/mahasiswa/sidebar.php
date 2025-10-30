@@ -152,7 +152,7 @@ function isActive($menuPageName)
           <span class="menu-header-text">Menu Pengguna</span>
         </li>
         <li class="menu-item <?php echo isActive('dashboard.php'); ?>">
-          <a href="dashboard.php" class="menu-link">
+          <a href="../dashboard/dashboard.php" class="menu-link">
             <i class="menu-icon tf-icons bx bx-home-circle"></i>
             <div data-i18n="Dashboard">Dashboard</div>
           </a>
@@ -184,7 +184,7 @@ function isActive($menuPageName)
           <span class="menu-header-text">Administrator</span>
         </li>
         <li class="menu-item <?php echo isActive('dashboard.php'); ?>">
-          <a href="dashboard.php" class="menu-link">
+          <a href="../dashboard/dashboard.php" class="menu-link">
             <i class="menu-icon tf-icons bxs-dashboard"></i>
             <div data-i18n="Admin Dashboard">Dashboard (Admin)</div>
           </a>
@@ -202,8 +202,8 @@ function isActive($menuPageName)
             <div data-i18n="CRUD Fasilitas">CRUD Fasilitas</div>
           </a>
         </li>
-        <li class="menu-item <?php echo isActive('crud-pengelola.php'); ?>">
-          <a href="crud-pengelola.php" class="menu-link">
+        <li class="menu-item <?php echo isActive('pengelola.php'); ?>">
+          <a href="../pengelola/pengelola.php" class="menu-link">
             <i class="menu-icon tf-icons bx bx-user-pin"></i>
             <div data-i18n="CRUD Pengelola">CRUD Pengelola</div>
           </a>

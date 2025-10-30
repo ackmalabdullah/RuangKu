@@ -30,7 +30,7 @@
     </div>
 
     <form id="loginForm" action="proses_login.php" method="POST" class="login-form" novalidate>
-      <h2>Login</h2>
+      <h2>Login Admin/Pengelola</h2>
       <p>Silakan masuk menggunakan akun terdaftar Anda.</p>
 
       <div class="input-group">
@@ -64,11 +64,14 @@
       <div class="support-link">
         <p>Belum punya akun? <a href="register.php">Daftar di sini</a></p>
       </div>
+      <div class="support-link">
+        <p>Login Sebagai Mahasiswa <a href="login_mahasiswa.php">Login di sini</a></p>
+      </div>
     </form>
   </div>
 
   <script>
-    document.getElementById('loginForm').addEventListener('submit', function (e) {
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
       let valid = true;
 
       const username = document.getElementById('username');
