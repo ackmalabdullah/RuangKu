@@ -12,7 +12,7 @@
          <div class="d-flex align-items-end row">
            <div class="col-sm-7">
              <div class="card-body">
-               <h2 class="card-title text-primary">Selamat Datang di Dashboard Mahasiswa, <?php echo $nama_user; ?>!</h2>
+               <h2 class="card-title text-primary">Selamat Datang di Dashboard Pengelola, <?php echo $nama_user; ?>!</h2>
                <p class="mb-4">
                  You have done <span class="fw-bold">72%</span> more sales today. Check your new badge in
                  your profile.

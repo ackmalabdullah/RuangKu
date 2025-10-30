@@ -231,7 +231,7 @@ function isActive($menuPageName)
       ?>
 
 
-      <?php if ($role == 'pengelola') : ?>
+      <?php if ($role == 'pengelola_ruangan') : ?>
         <li class="menu-header small text-uppercase">
           <span class="menu-header-text">Pengelola</span>
         </li>
@@ -262,6 +262,36 @@ function isActive($menuPageName)
       <?php endif; // Akhir blok Pengelola 
       ?>
 
+      <?php if ($role == 'pengelola_lab') : ?>
+        <li class="menu-header small text-uppercase">
+          <span class="menu-header-text">Pengelola</span>
+        </li>
+        <li class="menu-item <?php echo isActive('dashboard.php'); ?>">
+          <a href="dashboard.php" class="menu-link">
+            <i class="menu-icon tf-icons bxs-dashboard"></i>
+            <div data-i18n="Pengelola Dashboard">Dashboard (Pengelola)</div>
+          </a>
+        </li>
+        <li class="menu-item <?php echo isActive('persetujuan.php'); ?>">
+          <a href="persetujuan.php" class="menu-link">
+            <i class="menu-icon tf-icons bx bx-check-shield"></i>
+            <div data-i18n="Persetujuan">Persetujuan</div>
+          </a>
+        </li>
+        <li class="menu-item <?php echo isActive('riwayat-ruangan.php'); ?>">
+          <a href="riwayat-ruangan.php" class="menu-link">
+            <i class="menu-icon tf-icons bx bx-book-content"></i>
+            <div data-i18n="Riwayat Ruangan">Riwayat Peminjaman Ruangan</div>
+          </a>
+        </li>
+        <li class="menu-item <?php echo isActive('laporan.php'); ?>">
+          <a href="laporan.php" class="menu-link">
+            <i class="menu-icon tf-icons bx bx-file-blank"></i>
+            <div data-i18n="Laporan">Laporan</div>
+          </a>
+        </li>
+      <?php endif; // Akhir blok Pengelola 
+      ?>
 
       <li class="menu-header small text-uppercase">
         <span class="menu-header-text">Akun</span>
