@@ -10,6 +10,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
   <style>
     /* Tambahan gaya untuk pesan error */
     .error-message {
@@ -45,8 +47,8 @@
       <div class="input-group">
         <label for="password">Password</label>
         <div class="input-with-icon">
-          <i class="fas fa-lock"></i>
-          <input type="password" id="password" name="password" placeholder="Masukkan password Anda">
+          <i class="fas fa-lock"></i> <input type="password" id="password" name="password" placeholder="Buat password Anda">
+          <i class="fas fa-eye-slash toggle-password"></i>
         </div>
         <div id="passwordError" class="error-message">Password tidak boleh kosong.</div>
       </div>
@@ -62,46 +64,88 @@
       <button type="submit" class="login-button">Login</button>
 
       <div class="support-link">
-        <p>Belum punya akun? <a href="register.php">Daftar di sini</a></p>
-      </div>
-      <div class="support-link">
         <p>Login Sebagai Mahasiswa <a href="login_mahasiswa.php">Login di sini</a></p>
       </div>
+      
     </form>
   </div>
 
   <script>
     document.getElementById('loginForm').addEventListener('submit', function(e) {
       let valid = true;
-
       const username = document.getElementById('username');
       const password = document.getElementById('password');
       const usernameError = document.getElementById('usernameError');
       const passwordError = document.getElementById('passwordError');
-
-      // Reset pesan error
       usernameError.style.display = 'none';
       passwordError.style.display = 'none';
-
-      // Validasi Username
       if (username.value.trim() === '') {
         usernameError.style.display = 'block';
         valid = false;
       }
-
-      // Validasi Password
       if (password.value.trim() === '') {
         passwordError.style.display = 'block';
         valid = false;
       }
-
-      // Jika tidak valid, cegah form dikirim
       if (!valid) {
         e.preventDefault();
       }
     });
   </script>
 
-</body>
+<script>
+    const toggleButtons = document.querySelectorAll('.toggle-password');
 
+    toggleButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const inputField = this.parentElement.querySelector('input');
+
+        if (inputField.type === 'password') {
+          inputField.type = 'text';
+          this.classList.remove('fa-eye-slash');
+          this.classList.add('fa-eye');
+        } else {
+          inputField.type = 'password';
+          this.classList.remove('fa-eye');
+          this.classList.add('fa-eye-slash');
+        }
+      });
+    });
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
+  <?php
+  // Menampilkan pesan SUKSES (misalnya dari logout)
+  if (isset($_GET['message'])) {
+      $message_js = json_encode($_GET['message']);
+  ?>
+      <script>
+          Swal.fire({
+              title: 'Berhasil!',
+              text: <?php echo $message_js; ?>,
+              icon: 'success',
+              confirmButtonText: 'OK'
+          });
+      </script>
+  <?php
+  } // Akhir 'if message'
+
+  // Menampilkan pesan ERROR (dari proses_login.php)
+  if (isset($_GET['error'])) {
+      $error_js = json_encode($_GET['error']);
+  ?>
+      <script>
+          Swal.fire({
+              title: 'Gagal!',
+              text: <?php echo $error_js; ?>,
+              icon: 'error',
+              confirmButtonText: 'Coba Lagi'
+          });
+      </script>
+  <?php
+  } // Akhir 'if error'
+  ?>
+
+</body>
 </html>

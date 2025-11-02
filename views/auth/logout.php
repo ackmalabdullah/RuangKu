@@ -8,6 +8,6 @@ $_SESSION = array();
 session_destroy();
 
 // Redirect kembali ke halaman login
-header("Location: login.php?message=Anda telah berhasil logout.");
+header("Location: login_mahasiswa.php?message=Anda telah berhasil logout.");
 exit;
 ?>

@@ -13,7 +13,6 @@ $conn = $database->conn;
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // 5. Ambil data dari form DAN HAPUS SPASI di awal/akhir
-    // Ini perbaikan yang sangat penting!
     $login_input = trim($_POST['email']); 
     $password_input = trim($_POST['password']); 
 
@@ -29,25 +28,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->execute();
         
         $result = $stmt->get_result();
-        $user = $result->fetch_assoc(); // Ambil data mahasiswa jika ada
-
-        // --- LOGIKA PENGECEKAN BARU (LEBIH DETAIL) ---
+        $user = $result->fetch_assoc();
 
         // Cek #1: Apakah user-nya ditemukan?
         if (!$user) {
-            // JIKA USER TIDAK DITEMUKAN SAMA SEKALI
             $stmt->close();
             $conn->close();
-            header("Location: login_mahasiswa.php?error=UserTidakDitemukan");
+            // --- PERUBAHAN PESAN ERROR ---
+            header("Location: login_mahasiswa.php?error=NIM atau Email tidak terdaftar.");
             exit;
         }
 
         // Cek #2: User-nya ada, tapi apakah password-nya cocok?
         if (!password_verify($password_input, $user['password'])) {
-            // JIKA PASSWORD-NYA SALAH
             $stmt->close();
             $conn->close();
-            header("Location: login_mahasiswa.php?error=PasswordSalah");
+            // --- PERUBAHAN PESAN ERROR ---
+            header("Location: login_mahasiswa.php?error=Password yang Anda masukkan salah.");
             exit;
         }
 
@@ -62,12 +59,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // 11. Redirect ke dashboard mahasiswa
         $stmt->close();
         $conn->close();
-        header("Location: ../mahasiswa/dashboard/dashboard.php");
+        // (Pastikan path ini benar)
+        header("Location: ../mahasiswa/dashboard/dashboard.php"); 
         exit;
 
     } catch (Exception $e) {
         // Tangani error database
-        header("Location: login_mahasiswa.php?error=TerjadiMasalahSistem");
+        // --- PERUBAHAN PESAN ERROR ---
+        header("Location: login_mahasiswa.php?error=Terjadi masalah pada sistem. Silakan coba lagi nanti.");
         exit;
     }
 

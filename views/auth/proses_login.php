@@ -3,30 +3,25 @@
 session_start();
 
 // 2. Hubungkan ke database
-// Memanggil file koneksi Anda
 require '../../settings/koneksi.php'; 
 
 // 3. Buat objek database & ambil koneksinya
-// Ini adalah langkah kunci yang hilang sebelumnya
-$database = new Database(); // Membuat objek dari class Database
-$conn = $database->conn;    // Mengambil variabel koneksi ($conn) dari dalam class
+$database = new Database();
+$conn = $database->conn;
 
 // 4. Pastikan form di-submit
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    // 5. Ambil data dari form
-    $login_input = $_POST['username']; 
-    $password_input = $_POST['password'];
+    // 5. Ambil data dari form dan hapus spasi
+    $login_input = trim($_POST['username']); 
+    $password_input = trim($_POST['password']); // Menggunakan trim() juga
 
-    // Ganti 'users' dengan nama tabel Anda jika berbeda
     $nama_tabel = 'users'; 
 
     try {
-        // 6. SQL Query (dengan placeholder '?')
-        // Ini sesuai dengan placeholder form Anda (NIP/Email/Username)
+        // 6. SQL Query (Sudah benar, TANPA NIP)
         $sql = "SELECT * FROM $nama_tabel WHERE username = ? OR email = ?";
         
-        // 7. Siapkan dan jalankan statement MySQLi
         $stmt = $conn->prepare($sql);
         
         // 'ss' berarti kita binding 2 variabel string
@@ -34,53 +29,66 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
         $stmt->execute();
         
-        // Ambil hasil query
         $result = $stmt->get_result();
-        $user = $result->fetch_assoc(); // Ambil data user sebagai array
+        $user = $result->fetch_assoc(); 
 
-        // 8. Verifikasi user dan password
-        // (Pastikan Anda menggunakan password_hash() di database, BUKAN MD5)
-        if ($user && password_verify($password_input, $user['password'])) {
-            
-            // 9. JIKA BERHASIL: Simpan data penting ke session
-            $_SESSION['logged_in'] = true;
-            $_SESSION['id_user'] = $user['id_user'];
-            $_SESSION['nama'] = $user['nama'];
-            $_SESSION['role'] = $user['role'];
+        // --- INI LOGIKA BARU YANG ANDA INGINKAN ---
 
-            // 10. Logika Redirect Berdasarkan Role
-            $role = $user['role'];
-
-            if ($role == 'admin') {
-                header("Location: ../admin/dashboard/dashboard.php");
-                exit;
-            } elseif ($role == 'pengelola_ruangan') {
-                header("Location: ../pengelola/dashboard/dashboard.php");
-                exit;
-            } elseif ($role == 'pengelola_lab') {
-                header("Location: ../pengelola/dashboard/dashboard.php");
-                exit;
-            } else {
-                header("Location: login.php?error=Role tidak dikenali");
-                exit;
-            }
-
-        } else {
-            // 11. JIKA GAGAL: (User tidak ada atau password salah)
-            header("Location: login.php?error=Username atau password salah");
+        // 8. Cek #1: Apakah user-nya ditemukan?
+        if (!$user) {
+            $stmt->close();
+            $conn->close();
+            // Pesan error jika user tidak ada
+            header("Location: login.php?error=Username atau Email tidak terdaftar.");
             exit;
         }
-        
-        // Tutup statement
+
+        // 9. Cek #2: User ada, TAPI apakah password-nya cocok?
+        // (Pastikan nama kolom Anda 'password')
+        if (!password_verify($password_input, $user['password'])) { 
+            $stmt->close();
+            $conn->close();
+            // Pesan error HANYA jika password salah
+            header("Location: login.php?error=Password yang Anda masukkan salah.");
+            exit;
+        }
+
+        // --- JIKA LOLOS KEDUA CEK, BARU LOGIN ---
+
+        // 10. JIKA BERHASIL: Simpan data penting ke session
+        $_SESSION['logged_in'] = true;
+        $_SESSION['id_user'] = $user['id_user'];
+        $_SESSION['nama'] = $user['nama'];
+        $_SESSION['role'] = $user['role'];
+
+        // 11. Logika Redirect Berdasarkan Role
+        $role = $user['role'];
+
+        if ($role == 'admin') {
+            header("Location: ../admin/dashboard/dashboard.php");
+            exit;
+        } elseif ($role == 'pengelola_ruangan') {
+            header("Location: ../pengelola_ruangan/dashboard/dashboard.php");
+            exit;
+        } elseif ($role == 'pengelola_lab') {
+            // --- PERBAIKAN TYPO DI SINI ---
+            header("Location: ../pengelola_lab/dashboard/dashboard.php");
+            exit;
+        } else {
+            header("Location: login.php?error=Role tidak dikenali");
+            exit;
+        }
+        // (Blok 'else' yang lama sudah dihapus karena logikanya dipecah)
+
         $stmt->close();
 
     } catch (Exception $e) {
-        // Tangani error database
-        header("Location: login.php?error=Terjadi masalah sistem: " . $e->getMessage());
+        // Tangani error database (Lebih aman disembunyikan dari user)
+        header("Location: login.php?error=Terjadi masalah pada sistem. Silakan coba lagi nanti.");
+        // (Menghapus $e->getMessage() agar lebih aman)
         exit;
     }
     
-    // Tutup koneksi
     $conn->close();
 
 } else {
