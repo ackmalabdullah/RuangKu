@@ -149,7 +149,7 @@ function isActive($menuPageName)
 
       <?php if ($role == 'mahasiswa') : ?>
         <li class="menu-header small text-uppercase">
-          <span class="menu-header-text">Menu Pengguna</span>
+          <span class="menu-header-text">Mahasiswa</span>
         </li>
         <li class="menu-item <?php echo isActive('dashboard.php'); ?>">
           <a href="../dashboard/dashboard.php" class="menu-link">
@@ -158,19 +158,19 @@ function isActive($menuPageName)
           </a>
         </li>
         <li class="menu-item <?php echo isActive('peminjaman.php'); ?>">
-          <a href="peminjaman.php" class="menu-link">
+          <a href="../peminjaman/peminjaman.php" class="menu-link">
             <i class="menu-icon tf-icons bx bx-calendar-plus"></i>
             <div data-i18n="Peminjaman">Peminjaman</div>
           </a>
         </li>
         <li class="menu-item <?php echo isActive('profile.php'); ?>">
-          <a href="profile.php" class="menu-link">
+          <a href="../profile/profile.php" class="menu-link">
             <i class="menu-icon tf-icons bx bx-user"></i>
             <div data-i18n="Profile">Profile</div>
           </a>
         </li>
         <li class="menu-item <?php echo isActive('riwayat-mahasiswa.php'); ?>">
-          <a href="riwayat-mahasiswa.php" class="menu-link">
+          <a href="../riwayat/riwayat.php" class="menu-link">
             <i class="menu-icon tf-icons bx bx-history"></i>
             <div data-i18n="Riwayat (Peminjaman)">Riwayat (Peminjaman)</div>
           </a>
@@ -189,33 +189,20 @@ function isActive($menuPageName)
             <div data-i18n="Admin Dashboard">Dashboard (Admin)</div>
           </a>
         </li>
-
-        <li class="menu-item <?php echo isActive('crud-ruangan.php'); ?>">
-          <a href="crud-ruangan.php" class="menu-link">
-            <i class="menu-icon tf-icons bx bx-building-house"></i>
-            <div data-i18n="CRUD Ruangan & Lab">CRUD Ruangan & Lab</div>
-          </a>
-        </li>
-        <li class="menu-item <?php echo isActive('crud-fasilitas.php'); ?>">
-          <a href="crud-fasilitas.php" class="menu-link">
-            <i class="menu-icon tf-icons bx bx-chair"></i>
-            <div data-i18n="CRUD Fasilitas">CRUD Fasilitas</div>
-          </a>
-        </li>
         <li class="menu-item <?php echo isActive('pengelola.php'); ?>">
           <a href="../pengelola/pengelola.php" class="menu-link">
             <i class="menu-icon tf-icons bx bx-user-pin"></i>
             <div data-i18n="CRUD Pengelola">CRUD Pengelola</div>
           </a>
         </li>
-        <li class="menu-item <?php echo isActive('crud-prodi.php'); ?>">
-          <a href="crud-prodi.php" class="menu-link">
+        <li class="menu-item <?php echo isActive('prodi.php'); ?>">
+          <a href="../prodi/prodi.php" class="menu-link">
             <i class="menu-icon tf-icons bx bx-book-bookmark"></i>
             <div data-i18n="CRUD Prodi">CRUD Prodi</div>
           </a>
         </li>
-        <li class="menu-item <?php echo isActive('crud-kategori.php'); ?>">
-          <a href="crud-kategori.php" class="menu-link">
+        <li class="menu-item <?php echo isActive('kategori.php'); ?>">
+          <a href="../kategori/kategori.php" class="menu-link">
             <i class="menu-icon tf-icons bx bx-category"></i>
             <div data-i18n="CRUD Kategori">CRUD Kategori</div>
           </a>
@@ -236,19 +223,31 @@ function isActive($menuPageName)
           <span class="menu-header-text">Pengelola</span>
         </li>
         <li class="menu-item <?php echo isActive('dashboard.php'); ?>">
-          <a href="dashboard.php" class="menu-link">
+          <a href="../dashboard/dashboard.php" class="menu-link">
             <i class="menu-icon tf-icons bxs-dashboard"></i>
             <div data-i18n="Pengelola Dashboard">Dashboard (Pengelola)</div>
           </a>
         </li>
+        <li class="menu-item <?php echo isActive('ruangan.php'); ?>">
+          <a href="../ruangan/ruangan.php" class="menu-link">
+            <i class="menu-icon tf-icons bx bx-building-house"></i>
+            <div data-i18n="CRUD Ruangan">CRUD Ruangan</div>
+          </a>
+        </li>
+        <li class="menu-item <?php echo isActive('fasilitas_ruangan.php'); ?>">
+          <a href="../fasilitas_ruangan/fasilitas_ruangan.php" class="menu-link">
+            <i class="menu-icon tf-icons bx bx-chair"></i>
+            <div data-i18n="CRUD Fasilitas">CRUD Fasilitas</div>
+          </a>
+        </li>
         <li class="menu-item <?php echo isActive('persetujuan.php'); ?>">
-          <a href="persetujuan.php" class="menu-link">
+          <a href="../persetujuan/persetujuan.php" class="menu-link">
             <i class="menu-icon tf-icons bx bx-check-shield"></i>
             <div data-i18n="Persetujuan">Persetujuan</div>
           </a>
         </li>
-        <li class="menu-item <?php echo isActive('riwayat-ruangan.php'); ?>">
-          <a href="riwayat-ruangan.php" class="menu-link">
+        <li class="menu-item <?php echo isActive('riwayat.php'); ?>">
+          <a href="../riwayat/riwayat.php" class="menu-link">
             <i class="menu-icon tf-icons bx bx-book-content"></i>
             <div data-i18n="Riwayat Ruangan">Riwayat Peminjaman Ruangan</div>
           </a>
@@ -267,9 +266,15 @@ function isActive($menuPageName)
           <span class="menu-header-text">Pengelola</span>
         </li>
         <li class="menu-item <?php echo isActive('dashboard.php'); ?>">
-          <a href="dashboard.php" class="menu-link">
+          <a href="../dashboard/dashboard.php" class="menu-link">
             <i class="menu-icon tf-icons bxs-dashboard"></i>
             <div data-i18n="Pengelola Dashboard">Dashboard (Pengelola)</div>
+          </a>
+        </li>
+        <li class="menu-item <?php echo isActive('lab.php'); ?>">
+          <a href="../lab/lab.php" class="menu-link">
+            <i class="menu-icon tf-icons bx bx-building-house"></i>
+            <div data-i18n="Pengelola Lab">Lab</div>
           </a>
         </li>
         <li class="menu-item <?php echo isActive('persetujuan.php'); ?>">
@@ -281,7 +286,7 @@ function isActive($menuPageName)
         <li class="menu-item <?php echo isActive('riwayat-ruangan.php'); ?>">
           <a href="riwayat-ruangan.php" class="menu-link">
             <i class="menu-icon tf-icons bx bx-book-content"></i>
-            <div data-i18n="Riwayat Ruangan">Riwayat Peminjaman Ruangan</div>
+            <div data-i18n="Riwayat Lab">Riwayat Peminjaman Lab</div>
           </a>
         </li>
         <li class="menu-item <?php echo isActive('laporan.php'); ?>">

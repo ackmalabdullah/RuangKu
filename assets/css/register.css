@@ -1,0 +1,228 @@
+/* --- Global & Body --- */
+body {
+  font-family: 'Poppins', sans-serif;
+
+  /* --- GANTI PATH GAMBAR INI --- */
+  background-image: url('../../assets/img/gedungti.jpg'); /* Ganti dengan path gambar Anda */
+
+  /* Properti untuk membuat background full-screen */
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed; /* Membuat background diam saat form di-scroll */
+
+  /* --- Logika untuk Menengahkan Form --- */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+
+  /* Padding untuk memberi ruang jika form lebih tinggi dari layar (bisa di-scroll) */
+  padding: 20px 0;
+  box-sizing: border-box;
+}
+
+/* --- Container Form (Di Tengah) --- */
+.login-container {
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(5px); /* Efek blur */
+  padding: 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 550px; /* <-- PERUBAHAN DI SINI (Lebih lebar) */
+  box-sizing: border-box;
+  margin: 20px 0; /* Margin atas/bawah untuk scrolling */
+}
+
+/* --- Logo --- */
+.logo-container {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.logo-container img {
+  max-width: 150px;
+  height: auto;
+}
+
+/* --- Form --- */
+.login-form h2 {
+  text-align: center;
+  color: #333;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.login-form p {
+  text-align: center;
+  color: #666;
+  margin-bottom: 2rem;
+  font-size: 0.95rem;
+}
+
+/* --- Grup Input --- */
+.input-group {
+  margin-bottom: 1.25rem;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #555;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* --- Input dengan Ikon --- */
+.input-with-icon {
+  position: relative;
+}
+
+/* Aturan default untuk SEMUA ikon (di kiri) */
+.input-with-icon i {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #aaa;
+  z-index: 10;
+}
+
+/* --- Input Fields & Select (Dropdown) --- */
+.input-group input[type='text'],
+.input-group input[type='email'],
+.input-group input[type='password'],
+.input-group input[type='number'],
+.input-group select {
+  width: 100%;
+  padding: 12px 15px 12px 40px; /* Padding kiri 40px untuk ikon */
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+  background-color: #f9f9f9;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+/* --- Gaya Khusus Dropdown (Select) --- */
+.input-group select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%2M0 82.2c0%205%201.8%209.3%205.4%2013l128%20128c3.6%203.6%207.8%205.4%2013%205.4s9.4-1.8%2013-5.4l128-128c3.6-3.6%205.4-7.8%205.4-13%200-5-1.8-9.4-5.4-13z%22%2F%3E%3C%2Fsvg%3E');
+  background-repeat: no-repeat;
+  background-position: right 15px center;
+  background-size: 10px;
+  padding-right: 40px;
+}
+
+.input-group input[type='number'] {
+  -moz-appearance: textfield;
+}
+.input-group input[type='number']::-webkit-inner-spin-button,
+.input-group input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+/* --- Pesan Error (dari JS) --- */
+.error-message {
+  color: #ff4d4d;
+  font-size: 0.9em;
+  margin-top: 5px;
+  display: none;
+}
+
+/* --- Tombol Login/Daftar --- */
+.login-button {
+  width: 100%;
+  padding: 12px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s, box-shadow 0.3s;
+  margin-top: 1rem;
+}
+
+.login-button:hover {
+  background-color: #0056b3;
+  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+}
+
+/* --- Link Bantuan (Daftar/Login) --- */
+.support-link {
+  text-align: center;
+  margin-top: 1.25rem;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.support-link p {
+  margin: 0.5rem 0;
+  color: #555;
+  text-align: center;
+}
+
+.support-link a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.support-link a:hover {
+  text-decoration: underline;
+}
+
+/* --- 
+  PERBAIKAN IKON MATA (DIPINDAHKAN KE SINI)
+--- */
+
+/* 1. Atur posisi ikon mata (.toggle-password) ke KANAN */
+.input-with-icon .toggle-password {
+  left: auto; /* PENTING: Membatalkan 'left: 14px' */
+  right: 15px;
+  cursor: pointer;
+  /* Properti lain (top, transform, color, z-index) diwarisi dari .input-with-icon i */
+}
+
+/* 2. Atur padding KIRI dan KANAN HANYA untuk input password */
+.input-group input#password,
+.input-group input#konfirmasi_password {
+  /* Padding kiri 40px (gembok) + Padding kanan 40px (mata) */
+  padding-left: 40px !important;
+  padding-right: 40px !important;
+}
+
+
+/* --- Responsif untuk Mobile --- */
+@media (max-width: 500px) {
+  body {
+    padding: 1rem; /* Beri padding di body agar form tidak nempel ke tepi */
+  }
+
+  .login-container {
+    padding: 1.5rem;
+    margin: 0;
+    width: 100%; /* Lebar penuh di mobile */
+  }
+
+  .login-form h2 {
+    font-size: 1.5rem;
+  }
+  
+  /* Kode ikon mata tidak perlu ada di sini lagi */
+}

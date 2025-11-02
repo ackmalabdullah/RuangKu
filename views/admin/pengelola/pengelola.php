@@ -136,6 +136,5 @@ if (isset($_SESSION['pesan'])) {
 // BATAS AKHIR PERUBAHAN
 // -----------------------------------------------------------------
 
-// Masukkan footer
 require '../../../partials/mahasiswa/footer.php';
 ?>
