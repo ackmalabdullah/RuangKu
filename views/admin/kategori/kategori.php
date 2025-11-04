@@ -1,5 +1,5 @@
 <?php
-$required_role = 'pengelola_lab';
+$required_role = 'admin';
 
 require '../../../partials/mahasiswa/header.php';
 require '../../../partials/mahasiswa/sidebar.php';
