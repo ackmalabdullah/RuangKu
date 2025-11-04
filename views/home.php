@@ -97,6 +97,6 @@ require '../partials/header_landing.php';
 
 </body>
 <?php
-require '../partials/footer.php';
+require 'partials/footer.php';
 ?>
 </html>
