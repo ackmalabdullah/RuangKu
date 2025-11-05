@@ -52,7 +52,7 @@ if (isset($_GET['id'])) {
       <div class="card mb-4">
         <div class="card-header d-flex align-items-center justify-content-between">
           <h5 class="mb-0"><?= $judul_halaman; ?></h5>
-          <a href="fasilitas.php" class="btn btn-sm btn-secondary">
+          <a href="fasilitas_lab.php" class="btn btn-sm btn-secondary">
             <i class="bx bx-arrow-back me-1"></i> Kembali
           </a>
         </div>
