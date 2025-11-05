@@ -52,7 +52,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
         // 10. JIKA BERHASIL: Simpan data penting ke session
         $_SESSION['logged_in'] = true;
-        $_SESSION['id_user'] = $user['id_mahasiswa']; 
+        
+        // ==========================================================
+        // PERUBAHAN DI SINI: Key 'id_user' diubah menjadi 'id_mahasiswa'
+        $_SESSION['id_mahasiswa'] = $user['id_mahasiswa']; 
+        // ==========================================================
+        
         $_SESSION['nama'] = $user['nama'];
         $_SESSION['role'] = 'mahasiswa'; 
 

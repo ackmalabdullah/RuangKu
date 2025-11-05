@@ -91,21 +91,53 @@ if (isset($_GET['aksi'])) {
         if (isset($_GET['id'])) {
             $id_kategori = $_GET['id'];
             
-            $stmt = $koneksi->prepare("DELETE FROM kategori_ruangan WHERE id_kategori = ?");
-            $stmt->bind_param("i", $id_kategori);
-            
-            if ($stmt->execute()) {
-                $_SESSION['pesan'] = [
-                    'tipe' => 'success',
-                    'isi' => 'Kategori ruangan berhasil dihapus.'
-                ];
-            } else {
+            // --- LOGIKA BARU DIMULAI DI SINI ---
+            try {
+                // 1. Cek dulu apakah ID kategori ini dipakai di tabel 'ruangan'
+                // Asumsi berdasarkan error Anda: kolom di 'ruangan' adalah 'kategori_id'
+                $stmt_check = $koneksi->prepare("SELECT COUNT(*) as jumlah FROM ruangan WHERE kategori_id = ?");
+                $stmt_check->bind_param("i", $id_kategori);
+                $stmt_check->execute();
+                $result_check = $stmt_check->get_result();
+                $row = $result_check->fetch_assoc();
+                $jumlah_ruangan_terkait = $row['jumlah'];
+                $stmt_check->close();
+
+                // 2. Jika jumlah > 0 (ada relasi), JANGAN HAPUS. Beri pesan error.
+                if ($jumlah_ruangan_terkait > 0) {
+                    $_SESSION['pesan'] = [
+                        'tipe' => 'danger',
+                        'isi' => "Gagal menghapus! Kategori ini masih digunakan oleh $jumlah_ruangan_terkait ruangan."
+                    ];
+                } else {
+                    // 3. Jika jumlah == 0 (aman), baru jalankan proses HAPUS.
+                    $stmt = $koneksi->prepare("DELETE FROM kategori_ruangan WHERE id_kategori = ?");
+                    $stmt->bind_param("i", $id_kategori);
+                    
+                    if ($stmt->execute()) {
+                        $_SESSION['pesan'] = [
+                            'tipe' => 'success',
+                            'isi' => 'Kategori ruangan berhasil dihapus.'
+                        ];
+                    } else {
+                        $_SESSION['pesan'] = [
+                            'tipe' => 'danger',
+                            'isi' => 'Gagal menghapus data: ' . $stmt->error
+                        ];
+                    }
+                    $stmt->close();
+                }
+
+            } catch (mysqli_sql_exception $e) {
+                // 4. Ini adalah blok cadangan jika terjadi error SQL lain
                 $_SESSION['pesan'] = [
                     'tipe' => 'danger',
-                    'isi' => 'Gagal menghapus data: ' . $stmt->error
+                    'isi' => 'Terjadi error database: ' . $e->getMessage()
                 ];
             }
-            $stmt->close();
+            // --- LOGIKA BARU SELESAI ---
+
+            // Apapun hasilnya, redirect kembali ke halaman kategori
             header('Location: kategori.php');
             exit;
         }
