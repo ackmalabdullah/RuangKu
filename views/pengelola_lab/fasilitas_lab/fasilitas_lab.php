@@ -34,7 +34,7 @@ $query = mysqli_query($koneksi, "SELECT id_fasilitas, nama_fasilitas
             <tr>
               <th>No</th>
               <th>Nama Fasilitas</th>
-              <th width="160">Aksi</th>
+              <th>Aksi</th>
             </tr>
           </thead>
           <tbody>
