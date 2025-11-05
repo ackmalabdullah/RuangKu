@@ -271,6 +271,12 @@ function isActive($menuPageName)
             <div data-i18n="Pengelola Dashboard">Dashboard (Pengelola)</div>
           </a>
         </li>
+        <li class="menu-item <?php echo isActive('fasilitas_lab.php'); ?>">
+          <a href="../fasilitas_lab/fasilitas_lab.php" class="menu-link">
+            <i class="menu-icon tf-icons bx bx-building-house"></i>
+            <div data-i18n="Pengelola Lab">Fasilitas Lab</div>
+          </a>
+        </li>
         <li class="menu-item <?php echo isActive('lab.php'); ?>">
           <a href="../lab/lab.php" class="menu-link">
             <i class="menu-icon tf-icons bx bx-building-house"></i>
