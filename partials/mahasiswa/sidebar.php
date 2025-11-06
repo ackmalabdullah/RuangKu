@@ -169,7 +169,7 @@ function isActive($menuPageName)
             <div data-i18n="Profile">Profile</div>
           </a>
         </li>
-        <li class="menu-item <?php echo isActive('riwayat-mahasiswa.php'); ?>">
+        <li class="menu-item <?php echo isActive('riwayat.php'); ?>">
           <a href="../riwayat/riwayat.php" class="menu-link">
             <i class="menu-icon tf-icons bx bx-history"></i>
             <div data-i18n="Riwayat (Peminjaman)">Riwayat (Peminjaman)</div>
