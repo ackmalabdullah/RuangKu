@@ -169,12 +169,27 @@ function isActive($menuPageName)
             <div data-i18n="Profile">Profile</div>
           </a>
         </li>
+        <li class="menu-item <?php echo isActive('ganti_password.php'); ?>">
+          <a href="../profile/ganti_password.php" class="menu-link">
+            <i class="menu-icon tf-icons bx bx-lock-alt me-1"></i>
+            <div data-i18n="GantiPassword">Ganti Password</div>
+          </a>
+        </li>
         <li class="menu-item <?php echo isActive('riwayat.php'); ?>">
           <a href="../riwayat/riwayat.php" class="menu-link">
             <i class="menu-icon tf-icons bx bx-history"></i>
             <div data-i18n="Riwayat (Peminjaman)">Riwayat (Peminjaman)</div>
           </a>
         </li>
+        <li class="menu-header small text-uppercase">
+        <span class="menu-header-text">Logout</span>
+      </li>
+      <li class="menu-item">
+        <a href="../../auth/logout.php"class="menu-link">
+          <i class="menu-icon tf-icons bx bx-log-out"></i>
+          <div data-i18n="Logout">Logout</div>
+        </a>
+      </li>
       <?php endif; // Akhir blok Mahasiswa 
       ?>
 
@@ -214,6 +229,15 @@ function isActive($menuPageName)
             <div data-i18n="Laporan">Laporan</div>
           </a>
         </li>
+        <li class="menu-header small text-uppercase">
+        <span class="menu-header-text">Logout</span>
+      </li>
+      <li class="menu-item">
+        <a href="../../auth/logout.php"class="menu-link">
+          <i class="menu-icon tf-icons bx bx-log-out"></i>
+          <div data-i18n="Logout">Logout</div>
+        </a>
+      </li>
       <?php endif; // Akhir blok Admin 
       ?>
 
@@ -258,6 +282,15 @@ function isActive($menuPageName)
             <div data-i18n="Laporan">Laporan</div>
           </a>
         </li>
+        <li class="menu-header small text-uppercase">
+        <span class="menu-header-text">Logout</span>
+      </li>
+      <li class="menu-item">
+        <a href="../../auth/logout.php"class="menu-link">
+          <i class="menu-icon tf-icons bx bx-log-out"></i>
+          <div data-i18n="Logout">Logout</div>
+        </a>
+      </li>
       <?php endif; // Akhir blok Pengelola 
       ?>
 
@@ -301,18 +334,17 @@ function isActive($menuPageName)
             <div data-i18n="Laporan">Laporan</div>
           </a>
         </li>
-      <?php endif; // Akhir blok Pengelola 
-      ?>
-
-      <li class="menu-header small text-uppercase">
-        <span class="menu-header-text">Akun</span>
+        <li class="menu-header small text-uppercase">
+        <span class="menu-header-text">Logout</span>
       </li>
       <li class="menu-item">
-        <a href="../auth/logout.php" class="menu-link">
+        <a href="../../auth/logout.php"class="menu-link">
           <i class="menu-icon tf-icons bx bx-log-out"></i>
           <div data-i18n="Logout">Logout</div>
         </a>
       </li>
+      <?php endif; // Akhir blok Pengelola 
+      ?>
 
     </ul>
 </aside>
