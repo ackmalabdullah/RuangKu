@@ -32,7 +32,11 @@
       <li class="nav-item navbar-dropdown dropdown-user dropdown">
         <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
           <div class="avatar avatar-online">
-            <img src="../../../assets/assets_dashboard/assets/img/avatars/1.png" alt class="w-px-40 h-auto rounded-circle" />
+            <img
+              src="<?php echo $src_foto_profil; ?>"
+              alt="Avatar"
+              class="w-px-40 h-px-40 rounded-circle"
+              style="object-fit: cover;" />
           </div>
         </a>
         <ul class="dropdown-menu dropdown-menu-end">
@@ -41,7 +45,11 @@
               <div class="d-flex">
                 <div class="flex-shrink-0 me-3">
                   <div class="avatar avatar-online">
-                    <img src="../../../assets/assets_dashboard/assets/img/avatars/1.png" alt class="w-px-40 h-auto rounded-circle" />
+                    <img
+                      src="<?php echo $src_foto_profil; ?>"
+                      alt="Avatar"
+                      class="w-px-40 h-px-40 rounded-circle"
+                      style="object-fit: cover;" />
                   </div>
                 </div>
                 <div class="flex-grow-1">
@@ -59,7 +67,7 @@
             <div class="dropdown-divider"></div>
           </li>
           <li>
-            <a class="dropdown-item" href="#">
+            <a class="dropdown-item" href="../../mahasiswa/profile/profile.php">
               <i class="bx bx-user me-2"></i>
               <span class="align-middle">My Profile</span>
             </a>
@@ -69,9 +77,6 @@
               <i class="bx bx-cog me-2"></i>
               <span class="align-middle">Settings</span>
             </a>
-          </li>
-          <li>
-            <div class="dropdown-divider"></div>
           </li>
           <li>
             <div class="dropdown-divider"></div>

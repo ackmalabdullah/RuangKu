@@ -36,7 +36,7 @@ if (isset($_GET['aksi'])) {
             if ($stmt->execute()) {
                 $_SESSION['pesan'] = [
                     'tipe' => 'success',
-                    'isi' => 'Kategori ruangan berhasil ditambahkan.'
+                    'isi' => 'Kategori berhasil ditambahkan.'
                 ];
             } else {
                 $_SESSION['pesan'] = [

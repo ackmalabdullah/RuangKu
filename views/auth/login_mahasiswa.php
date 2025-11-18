@@ -28,7 +28,7 @@
   <div class="login-container">
 
     <div class="logo-container">
-      <img src="../../assets/img/logo.png" alt="Logo Instansi">
+      <img src="../../assets/img/logo kotak.png" alt="Logo Instansi">
     </div>
 
     <form id="loginForm" action="proses_login_mahasiswa.php" method="POST" class="login-form" novalidate>
@@ -58,7 +58,7 @@
           <input type="checkbox" id="remember" name="remember">
           <label for="remember">Ingat Saya</label>
         </div>
-        <a href="#" class="forgot-password">Lupa Password?</a>
+        <a href="lupa_password_mahasiswa.php" class="forgot-password">Lupa Password?</a>
       </div>
 
       <button type="submit" class="login-button">Login</button>

@@ -1,37 +1,36 @@
 <?php
-$required_role = 'pengelola_lab';
+$required_role = 'admin';
 
 require '../../../partials/mahasiswa/header.php';
 require '../../../partials/mahasiswa/sidebar.php';
 require '../../../partials/mahasiswa/navbar.php';
-// require '../../../settings/koneksi.php';
 
 $database = new Database();
 $koneksi = $database->conn;
 
 // Default (mode tambah)
 $mode = 'tambah';
-$judul_halaman = 'Tambah Fasilitas';
+$judul_halaman = 'Tambah Program Studi';
 $tombol_submit = 'Simpan';
-$form_action = 'proses_fasilitas.php?aksi=tambah';
+$form_action = 'proses_prodi.php?aksi=tambah';
 
 // Data default
 $data = [
-    'id_fasilitas' => '',
-    'nama_fasilitas' => ''
+    'id_prodi' => '',
+    'nama_prodi' => ''
 ];
 
 // Jika mode edit
 if (isset($_GET['id'])) {
     $mode = 'edit';
-    $id_fasilitas = $_GET['id'];
-    $judul_halaman = 'Edit Fasilitas';
+    $id_prodi = $_GET['id'];
+    $judul_halaman = 'Edit Program Studi';
     $tombol_submit = 'Update';
-    $form_action = 'proses_fasilitas.php?aksi=edit';
+    $form_action = 'proses_prodi.php?aksi=edit';
 
-    // Ambil data fasilitas berdasarkan ID
-    $stmt = $koneksi->prepare("SELECT id_fasilitas, nama_fasilitas FROM fasilitas WHERE id_fasilitas = ?");
-    $stmt->bind_param("i", $id_fasilitas);
+    // Ambil data prodi berdasarkan ID
+    $stmt = $koneksi->prepare("SELECT id_prodi, nama_prodi FROM prodi WHERE id_prodi = ?");
+    $stmt->bind_param("i", $id_prodi);
     $stmt->execute();
     $result = $stmt->get_result();
 
@@ -52,7 +51,7 @@ if (isset($_GET['id'])) {
       <div class="card mb-4">
         <div class="card-header d-flex align-items-center justify-content-between">
           <h5 class="mb-0"><?= $judul_halaman; ?></h5>
-          <a href="fasilitas_lab.php" class="btn btn-sm btn-secondary">
+          <a href="prodi_lab.php" class="btn btn-sm btn-secondary">
             <i class="bx bx-arrow-back me-1"></i> Kembali
           </a>
         </div>
@@ -61,21 +60,21 @@ if (isset($_GET['id'])) {
           <form action="<?= $form_action; ?>" method="POST">
 
             <?php if ($mode == 'edit'): ?>
-              <input type="hidden" name="id_fasilitas" value="<?= $data['id_fasilitas']; ?>">
+              <input type="hidden" name="id_prodi" value="<?= $data['id_prodi']; ?>">
             <?php endif; ?>
 
             <div class="row mb-3">
-              <label class="col-sm-2 col-form-label" for="nama_fasilitas">Nama Fasilitas</label>
+              <label class="col-sm-2 col-form-label" for="nama_prodi">Nama Prodi</label>
               <div class="col-sm-10">
                 <div class="input-group input-group-merge">
-                  <span class="input-group-text"><i class="bx bx-list-check"></i></span>
+                  <span class="input-group-text"><i class="bx bx-book-content"></i></span>
                   <input
                     type="text"
                     class="form-control"
-                    id="nama_fasilitas"
-                    name="nama_fasilitas"
-                    placeholder="Masukkan nama fasilitas (contoh: AC, Proyektor, WiFi)"
-                    value="<?= htmlspecialchars($data['nama_fasilitas']); ?>"
+                    id="nama_prodi"
+                    name="nama_prodi"
+                    placeholder="Masukkan nama program studi (contoh: Informatika, Akuntansi)"
+                    value="<?= htmlspecialchars($data['nama_prodi']); ?>"
                     required
                   />
                 </div>

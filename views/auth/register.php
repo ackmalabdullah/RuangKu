@@ -35,7 +35,7 @@ try {
 <body>
   <div class="login-container">
     <div class="logo-container">
-      <img src="../../assets/img/logo.png" alt="Logo Instansi">
+      <img src="../../assets/img/logo kotak.png" alt="Logo Instansi">
     </div>
 
     <form id="registerForm" action="proses_register.php" method="POST" class="login-form" novalidate>

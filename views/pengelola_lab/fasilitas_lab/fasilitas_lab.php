@@ -1,12 +1,13 @@
 <?php
 
-$required_role = 'admin';
+$required_role = 'pengelola_lab';
 
 require '../../../partials/mahasiswa/header.php';
 require '../../../partials/mahasiswa/sidebar.php';
 require '../../../partials/mahasiswa/navbar.php';
 
-$koneksi_path = dirname(__DIR__, 3) . '/settings/koneksi.php';
+// Koneksi dari version Raka (lebih aman dan fleksibel)
+$koneksi_path = dirname(_DIR_, 3) . '/settings/koneksi.php';
 
 if (!file_exists($koneksi_path)) {
     die('ERROR: File koneksi.php tidak ditemukan di path ' . $koneksi_path);
@@ -32,7 +33,6 @@ $query = mysqli_query($conn, "SELECT id_fasilitas, nama_fasilitas, created_at
         <a href="form_fasilitas.php" class="btn btn-primary">
           <i class="bx bx-plus me-1"></i> Tambah Fasilitas
         </a>
-        <!-- fixed path dari ../../ ke ..../../ untuk sampai ke root RuangKu/ -->
         <a href="cetak_pdf.php" class="btn btn-info" target="_blank">
           <i class="bx bx-printer me-1"></i> Cetak PDF
         </a>

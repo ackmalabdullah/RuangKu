@@ -28,7 +28,7 @@
   <div class="login-container">
 
     <div class="logo-container">
-      <img src="../../assets/img/logo.png" alt="Logo Instansi">
+      <img src="../../assets/img/logo kotak.png" alt="Logo Instansi">
     </div>
 
     <form id="loginForm" action="proses_login.php" method="POST" class="login-form" novalidate>
