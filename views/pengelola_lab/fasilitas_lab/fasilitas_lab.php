@@ -5,13 +5,19 @@ $required_role = 'admin';
 require '../../../partials/mahasiswa/header.php';
 require '../../../partials/mahasiswa/sidebar.php';
 require '../../../partials/mahasiswa/navbar.php';
-require '../../../settings/koneksi.php';
+
+$koneksi_path = dirname(__DIR__, 3) . '/settings/koneksi.php';
+
+if (!file_exists($koneksi_path)) {
+    die('ERROR: File koneksi.php tidak ditemukan di path ' . $koneksi_path);
+}
+require $koneksi_path;
 
 $database = new Database();
-$koneksi = $database->conn;
+$conn = $database->conn;
 
 // Query untuk menampilkan data fasilitas
-$query = mysqli_query($koneksi, "SELECT id_fasilitas, nama_fasilitas 
+$query = mysqli_query($conn, "SELECT id_fasilitas, nama_fasilitas, created_at
                                  FROM fasilitas 
                                  ORDER BY nama_fasilitas ASC");
 ?>
@@ -22,9 +28,13 @@ $query = mysqli_query($koneksi, "SELECT id_fasilitas, nama_fasilitas
     <h5 class="card-header">Data Fasilitas</h5>
     <div class="card-body">
 
-      <div class="mb-3">
+      <div class="mb-3 d-flex gap-2">
         <a href="form_fasilitas.php" class="btn btn-primary">
           <i class="bx bx-plus me-1"></i> Tambah Fasilitas
+        </a>
+        <!-- fixed path dari ../../ ke ..../../ untuk sampai ke root RuangKu/ -->
+        <a href="cetak_pdf.php" class="btn btn-info" target="_blank">
+          <i class="bx bx-printer me-1"></i> Cetak PDF
         </a>
       </div>
 
@@ -34,7 +44,7 @@ $query = mysqli_query($koneksi, "SELECT id_fasilitas, nama_fasilitas
             <tr>
               <th>No</th>
               <th>Nama Fasilitas</th>
-              <th width="160">Aksi</th>
+              <th width="200">Aksi</th>
             </tr>
           </thead>
           <tbody>
