@@ -11,77 +11,78 @@ $database = new Database();
 $koneksi = $database->conn; 
 
 // Cek apakah request datang dari POST, jika tidak, redirect
+// Redirect diubah ke 'lab.php' (atau ganti lab.php jika ada)
 if ($_SERVER['REQUEST_METHOD'] !== 'POST' && !isset($_GET['aksi'])) {
-    header('Location: ruangan.php');
+    header('Location: lab.php'); 
     exit;
 }
 
-// Lokasi Folder Gambar (Sesuaikan path ini jika perlu)
-$target_dir = '../../../assets/img/ruangan/'; 
+// Lokasi Folder Gambar (Dibiarkan sama, namun nama file akan disesuaikan)
+$target_dir = '../../../assets/img/lab/'; 
 
 $aksi = $_POST['aksi'] ?? $_GET['aksi'] ?? ''; // Ambil aksi dari POST atau GET
 
 switch ($aksi) {
     
-    // --- AKSI TAMBAH DATA RUANGAN ---
+    // --- AKSI TAMBAH DATA LABORATORIUM ---
     case 'tambah':
-        // Ambil data ruangan utama
-        // **PERHATIAN:** Gunakan $koneksi untuk sanitasi input
-        $nama_ruangan = mysqli_real_escape_string($koneksi, $_POST['nama_ruangan']);
+        // Ambil data Laboratorium utama
+        // **PERHATIAN:** Ganti nama variabel
+        $nama_lab = mysqli_real_escape_string($koneksi, $_POST['nama_lab']); // Diambil dari form_lab.php
         $kategori_id = mysqli_real_escape_string($koneksi, $_POST['kategori_id']);
         $lokasi = mysqli_real_escape_string($koneksi, $_POST['lokasi']);
         $kapasitas = (int)$_POST['kapasitas'];
-        $status_ruangan = mysqli_real_escape_string($koneksi, $_POST['status_ruangan']);
+        $status_lab = mysqli_real_escape_string($koneksi, $_POST['status_lab']); // Diambil dari form_lab.php
         
         $gambar_file_name = '';
 
         // 1. Proses Upload Gambar
-        $upload_result = handleFileUpload('gambar', $target_dir);
+        $upload_result = handleFileUpload('gambar', $target_dir, 'lab_'); // Menambahkan prefix 'lab_'
         if ($upload_result['status'] === 'error') {
             $_SESSION['pesan'] = ['tipe' => 'error', 'isi' => $upload_result['message']];
-            header('Location: form_ruangan.php');
+            header('Location: form_lab.php');
             exit;
         }
         $gambar_file_name = $upload_result['file_name'];
         
-        // 2. Insert data ruangan utama
-        $insert_query = "INSERT INTO ruangan (nama_ruangan, kategori_id, lokasi, kapasitas, status_ruangan, gambar) 
-                         VALUES ('$nama_ruangan', '$kategori_id', '$lokasi', '$kapasitas', '$status_ruangan', '$gambar_file_name')";
+        // 2. Insert data Laboratorium utama
+        $insert_query = "INSERT INTO laboratorium (nama_lab, kategori_id, lokasi, kapasitas, status_lab, gambar) 
+                         VALUES ('$nama_lab', '$kategori_id', '$lokasi', '$kapasitas', '$status_lab', '$gambar_file_name')"; // Ganti tabel & kolom
 
         if (mysqli_query($koneksi, $insert_query)) {
-            $ruangan_id_baru = mysqli_insert_id($koneksi);
+            $lab_id_baru = mysqli_insert_id($koneksi); // Ganti variabel
             
             // 3. Simpan relasi Fasilitas
-            simpanFasilitasRelasi($koneksi, $ruangan_id_baru, $_POST);
+            simpanFasilitasRelasi($koneksi, $lab_id_baru, $_POST); // Kirim ID Lab
             
-            $_SESSION['pesan'] = ['tipe' => 'success', 'isi' => 'Data ruangan **' . $nama_ruangan . '** berhasil ditambahkan.'];
+            $_SESSION['pesan'] = ['tipe' => 'success', 'isi' => 'Data Laboratorium **' . $nama_lab . '** berhasil ditambahkan.'];
         } else {
             // Hapus file yang sudah terlanjur diupload jika query gagal
             if (!empty($gambar_file_name)) {
                 @unlink($target_dir . $gambar_file_name);
             }
-            $_SESSION['pesan'] = ['tipe' => 'error', 'isi' => 'Gagal menambahkan data ruangan: ' . mysqli_error($koneksi)];
+            $_SESSION['pesan'] = ['tipe' => 'error', 'isi' => 'Gagal menambahkan data Laboratorium: ' . mysqli_error($koneksi)];
         }
         break;
 
-    // --- AKSI EDIT DATA RUANGAN ---
+    // --- AKSI EDIT DATA LABORATORIUM ---
     case 'edit':
-        $id_ruangan = mysqli_real_escape_string($koneksi, $_POST['id_ruangan']);
-        $nama_ruangan = mysqli_real_escape_string($koneksi, $_POST['nama_ruangan']);
+        $id_lab = mysqli_real_escape_string($koneksi, $_POST['id_lab']); // Ganti variabel
+        $nama_lab = mysqli_real_escape_string($koneksi, $_POST['nama_lab']);
         $kategori_id = mysqli_real_escape_string($koneksi, $_POST['kategori_id']);
         $lokasi = mysqli_real_escape_string($koneksi, $_POST['lokasi']);
         $kapasitas = (int)$_POST['kapasitas'];
-        $status_ruangan = mysqli_real_escape_string($koneksi, $_POST['status_ruangan']);
+        $status_lab = mysqli_real_escape_string($koneksi, $_POST['status_lab']);
         $gambar_lama = mysqli_real_escape_string($koneksi, $_POST['gambar_lama']);
         $gambar_update = $gambar_lama; // Default menggunakan gambar lama
 
         // 1. Proses Upload Gambar (Jika ada file baru)
         if (!empty($_FILES['gambar']['name'])) {
-            $upload_result = handleFileUpload('gambar', $target_dir);
+            $upload_result = handleFileUpload('gambar', $target_dir, 'lab_');
             
             if ($upload_result['status'] === 'error') {
                 $_SESSION['pesan'] = ['tipe' => 'error', 'isi' => $upload_result['message']];
-                header('Location: form_ruangan.php?id=' . $id_ruangan);
+                header('Location: form_lab.php?id=' . $id_lab); // Gunakan id_lab
                 exit;
             }
             // Jika upload berhasil, set nama file baru dan hapus gambar lama
@@ -91,55 +92,57 @@ switch ($aksi) {
             }
         }
         
-        // 2. Update data ruangan utama
-        $update_query = "UPDATE ruangan SET 
-                            nama_ruangan = '$nama_ruangan', 
+        // 2. Update data Laboratorium utama
+        $update_query = "UPDATE laboratorium SET 
+                            nama_lab = '$nama_lab', 
                             kategori_id = '$kategori_id', 
                             lokasi = '$lokasi', 
                             kapasitas = '$kapasitas', 
-                            status_ruangan = '$status_ruangan',
+                            status_lab = '$status_lab',
                             gambar = '$gambar_update'
-                        WHERE id_ruangan = '$id_ruangan'";
+                         WHERE id_lab = '$id_lab'"; // Ganti tabel & kolom WHERE
 
         if (mysqli_query($koneksi, $update_query)) {
             
             // 3. Simpan relasi Fasilitas (Hapus dan Insert ulang)
-            simpanFasilitasRelasi($koneksi, $id_ruangan, $_POST);
+            simpanFasilitasRelasi($koneksi, $id_lab, $_POST); // Kirim ID Lab
 
-            $_SESSION['pesan'] = ['tipe' => 'success', 'isi' => 'Data ruangan **' . $nama_ruangan . '** berhasil diubah.'];
+            $_SESSION['pesan'] = ['tipe' => 'success', 'isi' => 'Data Laboratorium **' . $nama_lab . '** berhasil diubah.'];
         } else {
             // Hapus file baru yang terlanjur diupload jika query gagal (jika $gambar_update != $gambar_lama)
             if ($gambar_update != $gambar_lama && !empty($gambar_update)) {
                 @unlink($target_dir . $gambar_update);
             }
-            $_SESSION['pesan'] = ['tipe' => 'error', 'isi' => 'Gagal mengubah data ruangan: ' . mysqli_error($koneksi)];
+            $_SESSION['pesan'] = ['tipe' => 'error', 'isi' => 'Gagal mengubah data Laboratorium: ' . mysqli_error($koneksi)];
         }
         break;
         
-    // --- AKSI HAPUS DATA RUANGAN ---
+    // --- AKSI HAPUS DATA LABORATORIUM ---
     case 'hapus':
-        $id_ruangan = mysqli_real_escape_string($koneksi, $_GET['id']);
+        $id_lab = mysqli_real_escape_string($koneksi, $_GET['id']); // Ganti variabel
         
         // 1. Ambil nama gambar untuk dihapus
-        $result_gambar = mysqli_query($koneksi, "SELECT gambar FROM ruangan WHERE id_ruangan = '$id_ruangan'");
+        $result_gambar = mysqli_query($koneksi, "SELECT gambar FROM laboratorium WHERE id_lab = '$id_lab'"); // Ganti tabel & kolom
         $data_gambar = mysqli_fetch_assoc($result_gambar);
         $gambar_lama = $data_gambar['gambar'] ?? null;
         
         // 2. Hapus relasi fasilitas terlebih dahulu
-        $query_del_fas = "DELETE FROM ruangan_fasilitas WHERE ruangan_id = '$id_ruangan'";
+        // Tabel: lab_fasilitas
+        $query_del_fas = "DELETE FROM lab_fasilitas WHERE lab_id = '$id_lab'"; // Ganti tabel & kolom
         mysqli_query($koneksi, $query_del_fas);
         
-        // 3. Hapus data ruangan utama
-        $query_del_ruang = "DELETE FROM ruangan WHERE id_ruangan = '$id_ruangan'";
+        // 3. Hapus data Laboratorium utama
+        // Tabel: laboratorium
+        $query_del_lab = "DELETE FROM laboratorium WHERE id_lab = '$id_lab'"; // Ganti tabel & kolom
         
-        if (mysqli_query($koneksi, $query_del_ruang)) {
+        if (mysqli_query($koneksi, $query_del_lab)) {
             // 4. Hapus file gambar fisik dari server
             if (!empty($gambar_lama)) {
                 @unlink($target_dir . $gambar_lama);
             }
-            $_SESSION['pesan'] = ['tipe' => 'success', 'isi' => 'Data ruangan berhasil dihapus.'];
+            $_SESSION['pesan'] = ['tipe' => 'success', 'isi' => 'Data Laboratorium berhasil dihapus.'];
         } else {
-            $_SESSION['pesan'] = ['tipe' => 'error', 'isi' => 'Gagal menghapus data ruangan: ' . mysqli_error($koneksi)];
+            $_SESSION['pesan'] = ['tipe' => 'error', 'isi' => 'Gagal menghapus data Laboratorium: ' . mysqli_error($koneksi)];
         }
         break;
 
@@ -148,8 +151,8 @@ switch ($aksi) {
         break;
 }
 
-// Redirect ke halaman daftar ruangan
-header('Location: ruangan.php');
+// Redirect ke halaman daftar lab
+header('Location: lab.php');
 exit;
 
 
@@ -161,9 +164,10 @@ exit;
  * Mengelola proses upload file gambar.
  * @param string $input_name Nama input file dari form ($_FILES)
  * @param string $target_dir Folder tujuan penyimpanan
+ * @param string $prefix Prefix untuk nama file unik (opsional)
  * @return array Hasil upload (status, message, file_name)
  */
-function handleFileUpload($input_name, $target_dir) {
+function handleFileUpload($input_name, $target_dir, $prefix = 'room_') {
     if (empty($_FILES[$input_name]['name'])) {
         return ['status' => 'success', 'message' => 'Tidak ada file diupload.', 'file_name' => ''];
     }
@@ -188,8 +192,8 @@ function handleFileUpload($input_name, $target_dir) {
         return ['status' => 'error', 'message' => 'Terjadi kesalahan saat mengupload file.'];
     }
 
-    // Buat nama file unik
-    $new_file_name = uniqid('room_', true) . '.' . $file_ext;
+    // Buat nama file unik menggunakan prefix yang diberikan
+    $new_file_name = uniqid($prefix, true) . '.' . $file_ext;
     $target_file = $target_dir . $new_file_name;
 
     if (move_uploaded_file($file_tmp, $target_file)) {
@@ -200,18 +204,19 @@ function handleFileUpload($input_name, $target_dir) {
 }
 
 /**
- * Menyimpan relasi fasilitas ke tabel ruangan_fasilitas (menghapus yang lama jika ada dan insert yang baru).
+ * Menyimpan relasi fasilitas ke tabel lab_fasilitas (menghapus yang lama jika ada dan insert yang baru).
  * @param mysqli $koneksi Koneksi database
- * @param int $ruangan_id ID ruangan yang sedang diproses
+ * @param int $lab_id ID laboratorium yang sedang diproses
  * @param array $post_data Data POST dari form
  */
-function simpanFasilitasRelasi($koneksi, $ruangan_id, $post_data) {
+function simpanFasilitasRelasi($koneksi, $lab_id, $post_data) {
     
     $fasilitas_terpilih = $post_data['fasilitas_id'] ?? [];
     $jumlah_fasilitas = $post_data['jumlah_fasilitas'] ?? [];
 
     // Hapus semua relasi lama terlebih dahulu
-    $hapus_relasi_lama = "DELETE FROM ruangan_fasilitas WHERE ruangan_id = '" . mysqli_real_escape_string($koneksi, $ruangan_id) . "'";
+    // Tabel: lab_fasilitas
+    $hapus_relasi_lama = "DELETE FROM lab_fasilitas WHERE lab_id = '" . mysqli_real_escape_string($koneksi, $lab_id) . "'"; // Ganti tabel & kolom
     mysqli_query($koneksi, $hapus_relasi_lama);
 
     // Masukkan relasi fasilitas yang baru
@@ -222,17 +227,18 @@ function simpanFasilitasRelasi($koneksi, $ruangan_id, $post_data) {
             
             // Ambil jumlah dari array asosiatif (mengabaikan input disabled, hanya mengambil yang dicentang)
             $jumlah = isset($jumlah_fasilitas[$fasilitas_id]) && is_numeric($jumlah_fasilitas[$fasilitas_id]) 
-                        ? (int)$jumlah_fasilitas[$fasilitas_id] 
-                        : 1;
+                         ? (int)$jumlah_fasilitas[$fasilitas_id] 
+                         : 1;
             
             // Pastikan jumlah minimal 1
             if ($jumlah < 1) $jumlah = 1;
 
-            $insert_values[] = "('" . mysqli_real_escape_string($koneksi, $ruangan_id) . "', '" . $id . "', '" . $jumlah . "')";
+            // Tabel: lab_fasilitas (lab_id, fasilitas_id, jumlah)
+            $insert_values[] = "('" . mysqli_real_escape_string($koneksi, $lab_id) . "', '" . $id . "', '" . $jumlah . "')";
         }
 
         if (!empty($insert_values)) {
-            $insert_relasi = "INSERT INTO ruangan_fasilitas (ruangan_id, fasilitas_id, jumlah) VALUES " . implode(", ", $insert_values);
+            $insert_relasi = "INSERT INTO lab_fasilitas (lab_id, fasilitas_id, jumlah) VALUES " . implode(", ", $insert_values); // Ganti tabel & kolom
             mysqli_query($koneksi, $insert_relasi);
         }
     }

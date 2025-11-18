@@ -27,12 +27,12 @@ $query = mysqli_query($koneksi, "SELECT id_kategori, nama_kategori
   ?>
 
   <div class="card">
-    <h5 class="card-header">Data Kategori Ruangan</h5>
+    <h5 class="card-header">Data Kategori</h5>
     <div class="card-body">
 
       <div class="mb-3">
         <a href="form_kategori.php" class="btn btn-primary">
-          <i class="bx bx-plus me-1"></i> Tambah Kategori Ruangan
+          <i class="bx bx-plus me-1"></i> Tambah Kategori
         </a>
       </div>
 
@@ -75,7 +75,7 @@ $query = mysqli_query($koneksi, "SELECT id_kategori, nama_kategori
             } else {
               ?>
               <tr>
-                <td colspan="3" class="text-center">Belum ada data kategori ruangan.</td>
+                <td colspan="3" class="text-center">Belum ada data kategori.</td>
               </tr>
             <?php
             }
