@@ -6,13 +6,6 @@ require '../../../partials/mahasiswa/header.php';
 require '../../../partials/mahasiswa/sidebar.php';
 require '../../../partials/mahasiswa/navbar.php';
 
-// Koneksi dari version Raka (lebih aman dan fleksibel)
-$koneksi_path = dirname(_DIR_, 3) . '/settings/koneksi.php';
-
-if (!file_exists($koneksi_path)) {
-    die('ERROR: File koneksi.php tidak ditemukan di path ' . $koneksi_path);
-}
-require $koneksi_path;
 
 $database = new Database();
 $conn = $database->conn;
@@ -44,7 +37,7 @@ $query = mysqli_query($conn, "SELECT id_fasilitas, nama_fasilitas, created_at
             <tr>
               <th>No</th>
               <th>Nama Fasilitas</th>
-              <th width="200">Aksi</th>
+              <th>Aksi</th>
             </tr>
           </thead>
           <tbody>
