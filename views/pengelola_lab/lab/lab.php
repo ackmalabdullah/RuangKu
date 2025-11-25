@@ -81,6 +81,9 @@ if (!$result) {
                 <a href="form_lab.php" class="btn btn-primary">
                     <i class="bx bx-plus me-1"></i> Tambah Data Laboratorium
                 </a>
+                <a href="cetak_pdf.php" class="btn btn-info" target="_blank">
+                    <i class="bx bx-printer me-1"></i> Cetak PDF
+                </a>
             </div>
 
             <div class="table-responsive">

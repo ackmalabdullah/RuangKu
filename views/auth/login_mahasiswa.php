@@ -47,7 +47,7 @@
       <div class="input-group">
         <label for="password">Password</label>
         <div class="input-with-icon">
-          <i class="fas fa-lock"></i> <input type="password" id="password" name="password" placeholder="Buat password Anda">
+          <i class="fas fa-lock"></i> <input type="password" id="password" name="password" placeholder="Masukkan Password Anda">
           <i class="fas fa-eye-slash toggle-password"></i>
         </div>
         <div id="passwordError" class="error-message">Password tidak boleh kosong.</div>
