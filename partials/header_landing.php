@@ -23,7 +23,9 @@ $base_path = "/APKPINRULAB";
     <header class="header">
         <div class="container">
             <nav class="navbar">
-                <a href="#" class="nav-logo">RuangKu JTI</a>
+                <a href="#" class="nav-logo">
+                    <img src="../assets/img/logo pnjng putih.png" class="logo-img">
+                </a>
                 <ul class="nav-menu">
                     <li class="nav-item"><a href="#" class="nav-link">Home</a></li>
                     <li class="nav-item"><a href="#" class="nav-link">Ruangan</a></li>
