@@ -5,40 +5,41 @@ $required_role = 'admin';
 require '../../../partials/mahasiswa/header.php';
 require '../../../partials/mahasiswa/sidebar.php';
 require '../../../partials/mahasiswa/navbar.php';
-// require '../../../settings/koneksi.php';
+
+// Koneksi dari version Raka (lebih aman dan fleksibel)
+// $koneksi_path = dirname(_DIR_, 3) . '/settings/koneksi.php';
+
+// if (!file_exists($koneksi_path)) {
+//     die('ERROR: File koneksi.php tidak ditemukan di path ' . $koneksi_path);
+// }
+// require $koneksi_path;
 
 $database = new Database();
-$koneksi = $database->conn;
+$conn = $database->conn;
 
-$query = mysqli_query($koneksi, "SELECT id_user, nama, email, username, role 
-                                  FROM users 
-                                  WHERE role = 'pengelola_ruangan' OR role = 'pengelola_lab' 
-                                  ORDER BY nama ASC");
+// Query untuk menampilkan data pengelola
+$query = mysqli_query($conn, "SELECT id_user, nama, email, username, role, created_at
+                                 FROM users 
+                                 WHERE role IN ('pengelola_lab', 'pengelola_ruangan')
+                                 ORDER BY nama ASC");
 ?>
 
 <div class="container-xxl flex-grow-1 container-p-y">
-
-  <?php
-  // -----------------------------------------------------------------
-  // BLOK INI SAYA HAPUS
-  // -----------------------------------------------------------------
-  // if (isset($_SESSION['pesan'])) {
-  //   $pesan = $_SESSION['pesan'];
-  //   echo '... (alert bootstrap) ...';
-  //   unset($_SESSION['pesan']);
-  // }
-  // -----------------------------------------------------------------
-  ?>
 
   <div class="card">
     <h5 class="card-header">Data Pengelola</h5>
     <div class="card-body">
 
-      <div class="mb-3">
+     <div class="mb-3 d-flex gap-2">
+        <!-- ensuring both buttons are visible side by side -->
         <a href="form_pengelola.php" class="btn btn-primary">
-          <i class="bx bx-plus me-1"></i> Tambah Data Pengelola
+          <i class="bx bx-plus me-1"></i> Tambah Pengelola
+        </a>
+        <a href="cetak_pdf.php" class="btn btn-info" target="_blank">
+          <i class="bx bx-printer me-1"></i> Cetak PDF
         </a>
       </div>
+
 
       <div class="table-responsive">
         <table class="table table-bordered table-hover">
@@ -59,35 +60,14 @@ $query = mysqli_query($koneksi, "SELECT id_user, nama, email, username, role
               while ($data = mysqli_fetch_assoc($query)) {
             ?>
                 <tr>
+                  <td><?= $no++; ?></td>
                   <td>
-                    <?= $no++; ?>
-                  </td>
-
-                  <td>
-                    <i class="bx bxs-user fa-lg text-primary me-3"></i>
+                    <i class="bx bx-user-circle fa-lg text-primary me-2"></i>
                     <strong><?= htmlspecialchars($data['nama']); ?></strong>
                   </td>
-
-                  <td>
-                    <i class="bx bx-envelope fa-lg text-info me-3"></i>
-                    <?= htmlspecialchars($data['email']); ?>
-                  </td>
-
-                  <td>
-                    <i class="bx bx-id-card fa-lg text-warning me-3"></i>
-                    <?= htmlspecialchars($data['username']); ?>
-                  </td>
-
-                  <td>
-                    <?php
-                    $badge_class = ($data['role'] == 'pengelola_ruangan') ? 'bg-label-info' : 'bg-label-success';
-                    $role_name = ($data['role'] == 'pengelola_ruangan') ? 'Pengelola Ruangan' : 'Pengelola Lab';
-                    $role_icon_color = ($data['role'] == 'pengelola_ruangan') ? 'text-info' : 'text-success';
-                    ?>
-                    <i class="bx bx-shield-quarter fa-lg <?= $role_icon_color; ?> me-3"></i>
-                    <span class="badge <?= $badge_class; ?>"><?= $role_name; ?></span>
-                  </td>
-                  
+                  <td><?= htmlspecialchars($data['email']); ?></td>
+                  <td><?= htmlspecialchars($data['username']); ?></td>
+                  <td><?= htmlspecialchars($data['role']); ?></td>
                   <td>
                     <div>
                       <a class="btn btn-warning btn-sm me-1" href="form_pengelola.php?id=<?= $data['id_user']; ?>">
@@ -102,14 +82,14 @@ $query = mysqli_query($koneksi, "SELECT id_user, nama, email, username, role
                   </td>
                 </tr>
               <?php
-              } // Akhir while
+              }
             } else {
               ?>
               <tr>
                 <td colspan="6" class="text-center">Belum ada data pengelola.</td>
               </tr>
             <?php
-            } // Akhir if-else
+            }
             ?>
           </tbody>
         </table>
@@ -119,72 +99,50 @@ $query = mysqli_query($koneksi, "SELECT id_user, nama, email, username, role
 </div>
 
 <script>
-  // 1. Ambil semua tombol dengan class 'btn-delete'
-  const deleteButtons = document.querySelectorAll('.btn-delete');
+  // Konfirmasi hapus dengan SweetAlert
+  document.querySelectorAll('.btn-delete').forEach(button => {
+    button.addEventListener('click', function(event) {
+      event.preventDefault();
+      const deleteUrl = this.href;
 
-  // 2. Loop semua tombol yang ditemukan
-  deleteButtons.forEach(button => {
-    
-    // 3. Tambahkan event listener 'click' untuk setiap tombol
-    button.addEventListener('click', function (event) {
-        
-        // 4. Hentikan aksi default dari link
-        event.preventDefault(); 
-        
-        // 5. Ambil URL hapus dari atribut 'href'
-        const deleteUrl = this.href; 
-
-        // 6. Tampilkan konfirmasi SweetAlert
-        Swal.fire({
-            title: 'Apakah Anda yakin?',
-            text: "Data yang sudah dihapus tidak dapat dikembalikan!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Ya, hapus!',
-            cancelButtonText: 'Batal'
-        }).then((result) => {
-            // 7. Jika pengguna menekan "Ya, hapus!"
-            if (result.isConfirmed) {
-                // Arahkan browser ke URL hapus
-                window.location.href = deleteUrl;
-            }
-        });
+      Swal.fire({
+        title: 'Apakah Anda yakin?',
+        text: "Data yang dihapus tidak dapat dikembalikan!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Ya, hapus!',
+        cancelButtonText: 'Batal'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.href = deleteUrl;
+        }
+      });
     });
   });
 </script>
 
-
 <?php
-// -----------------------------------------------------------------
-// BLOK PHP ANDA UNTUK SWEETALERT SESSION (INI SUDAH BENAR)
-// -----------------------------------------------------------------
-// Cek jika ada pesan dari session
+// SWEETALERT SESSION
 if (isset($_SESSION['pesan'])) {
   $pesan = $_SESSION['pesan'];
-  // Tentukan tipe ikon berdasarkan 'tipe' pesan (success atau danger)
   $tipe_alert = ($pesan['tipe'] == 'success') ? 'success' : 'error';
   $judul_alert = ($pesan['tipe'] == 'success') ? 'Berhasil!' : 'Gagal!';
 
-  // Cetak script JavaScript untuk SweetAlert
   echo "
-<script>
-  Swal.fire({
-    title: '" . addslashes($judul_alert) . "',
-    text: '" . addslashes($pesan['isi']) . "',
-    icon: '" . $tipe_alert . "',
-    confirmButtonText: 'OK'
-  });
-</script>
-";
+    <script>
+      Swal.fire({
+        title: '" . addslashes($judul_alert) . "',
+        text: '" . addslashes($pesan['isi']) . "',
+        icon: '" . $tipe_alert . "',
+        confirmButtonText: 'OK'
+      });
+    </script>
+  ";
 
-  // Hapus session 'pesan' setelah ditampilkan
   unset($_SESSION['pesan']);
 }
-// -----------------------------------------------------------------
-// BATAS AKHIR PERUBAHAN
-// -----------------------------------------------------------------
 
 require '../../../partials/mahasiswa/footer.php';
 ?>
