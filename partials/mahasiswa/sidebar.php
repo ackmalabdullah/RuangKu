@@ -219,6 +219,69 @@ function isActive($menuPageName)
             <div>Logout</div>
           </a>
         </li>
+      <?php endif; ?>
+
+      <?php if ($role == 'pengelola_ruangan') : ?>
+        <li class="menu-header small text-uppercase">
+          <span class="menu-header-text">Pengelola</span>
+        </li>
+        <li class="menu-item <?php echo isActive('dashboard.php'); ?>">
+          <a href="../dashboard/dashboard.php" class="menu-link">
+            <i class="menu-icon tf-icons bxs-dashboard"></i>
+            <div>Dashboard (Pengelola)</div>
+          </a>
+        </li>
+        <li class="menu-item <?php echo isActive('fasilitas_ruangan.php'); ?>">
+          <a href="../fasilitas_ruangan/fasilitas_ruangan.php" class="menu-link">
+            <i class="menu-icon tf-icons bx bx-building-house"></i>
+            <div>Fasilitas Ruangan</div>
+          </a>
+        </li>
+        <li class="menu-item <?php echo isActive('ruangan.php'); ?>">
+          <a href="../ruangan/ruangan.php" class="menu-link">
+            <i class="menu-icon tf-icons bx bx-building-house"></i>
+            <div>Ruangan</div>
+          </a>
+        </li>
+        <li class="menu-item <?php echo isActive('persetujuan.php'); ?>">
+          <a href="../persetujuan/persetujuan.php" class="menu-link">
+            <i class="menu-icon tf-icons bx bx-check-shield"></i>
+            <div>Persetujuan</div>
+          </a>
+        </li>
+        <li class="menu-item <?php echo isActive('riwayat-ruangan.php'); ?>">
+          <a href="riwayat-ruangan.php" class="menu-link">
+            <i class="menu-icon tf-icons bx bx-book-content"></i>
+            <div>Riwayat Peminjaman Lab</div>
+          </a>
+        </li>
+        <li class="menu-item has-sub <?= (isActive('laporan_peminjaman.php') || isActive('laporan_lab.php')) ? 'open' : '' ?>">
+          <a href="javascript:void(0);" class="menu-link menu-toggle">
+            <i class="menu-icon tf-icons bx bx-file-blank"></i>
+            <div>Laporan</div>
+          </a>
+          <ul class="menu-sub">
+            <li class="menu-item <?= isActive('laporan_peminjaman.php') ?>">
+              <a href="../laporan/laporan_peminjaman.php" class="menu-link" onclick="event.stopPropagation()">
+                <div data-i18n="Peminjaman">Peminjaman</div>
+              </a>
+            </li>
+            <li class="menu-item <?= isActive('laporan_lab.php') ?>">
+              <a href="../laporan/laporan_lab.php" class="menu-link" onclick="event.stopPropagation()">
+                <div data-i18n="Lab">Lab</div>
+              </a>
+            </li>
+          </ul>
+        </li>
+        <li class="menu-header small text-uppercase">
+          <span class="menu-header-text">Logout</span>
+        </li>
+        <li class="menu-item">
+          <a href="../../auth/logout.php" class="menu-link">
+            <i class="menu-icon tf-icons bx bx-log-out"></i>
+            <div>Logout</div>
+          </a>
+        </li>
 
       <?php endif; ?>
     </ul>
