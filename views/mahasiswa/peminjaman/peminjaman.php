@@ -32,9 +32,9 @@ if ($tipe_entitas == 'ruangan') {
     $kolom_nama = 'nama_lab';
     $kolom_status = 'status_lab';
     $tabel_fasilitas_junction = 'lab_fasilitas';
-    $tabel_jadwal = 'jadwal_lab';
-    $id_fasilitas_fk = 'lab_id'; // FK di lab_fasilitas
-    $id_jadwal_fk = 'lab_id'; // FK di jadwal_lab
+    $tabel_jadwal = 'jadwal_lab'; // SESUAIKAN
+    $id_fasilitas_fk = 'lab_id';
+    $id_jadwal_fk = 'lab_id'; // SESUAIKAN
     $nama_entitas_kapital = 'Laboratorium';
     $folder_gambar = 'lab';
 } else {
@@ -46,7 +46,13 @@ if ($tipe_entitas == 'ruangan') {
 
 
 // --- 3. Ambil Daftar Semua Entitas (Ruangan atau Lab) ---
-$sql_list = "SELECT {$kolom_id}, {$kolom_nama} FROM {$tabel_entitas} ORDER BY {$kolom_nama}";
+// --- 3. Ambil Daftar Semua Entitas (TANPA DUMMY SISTEM) ---
+$sql_list = "SELECT {$kolom_id}, {$kolom_nama} 
+             FROM {$tabel_entitas} 
+             WHERE {$kolom_status} = 'tersedia' 
+               AND {$kolom_id} > 0 
+               AND {$kolom_nama} NOT LIKE '%SISTEM%'
+             ORDER BY {$kolom_nama}";
 $result_list = mysqli_query($koneksi, $sql_list);
 
 // --- 4. Ambil Detail Entitas, Fasilitas, dan Jadwal (Jika Entitas dipilih) ---

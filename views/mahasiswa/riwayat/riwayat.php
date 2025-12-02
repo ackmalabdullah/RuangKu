@@ -4,34 +4,42 @@ require '../../../partials/mahasiswa/header.php';
 require '../../../partials/mahasiswa/sidebar.php';
 require '../../../partials/mahasiswa/navbar.php';
 
-// --- koneksi ---
-// require '../../../settings/koneksi.php';
 $db = new Database();
 $koneksi = $db->conn;
 
-// --- ambil data peminjaman berdasarkan mahasiswa yang login ---
-// session_start();
 $id_mahasiswa = $_SESSION['id_mahasiswa'] ?? 0;
 
+// PERBAIKAN: Query yang sesuai dengan struktur tabel yang sudah benar
 $query = "
   SELECT 
-      p.id_peminjaman,
-      COALESCE(r.nama_ruangan, l.nama_lab) AS nama_entitas,
+      p.id_peminjaman AS id_peminjaman,
+      -- Tentukan tipe berdasarkan prioritas lab > ruangan
       CASE 
-          WHEN p.ruangan_id IS NOT NULL THEN 'Ruangan'
-          WHEN p.lab_id IS NOT NULL THEN 'Laboratorium'
+          WHEN p.lab_id IS NOT NULL AND p.lab_id > 0 
+               THEN 'Laboratorium'
+          WHEN p.ruangan_id IS NOT NULL AND p.ruangan_id > 0 
+               THEN 'Ruangan'
+          ELSE 'Tidak Diketahui'
       END AS tipe,
+      -- Nama entitas sesuai tipe
+      CASE 
+          WHEN p.lab_id IS NOT NULL AND p.lab_id > 0 
+               THEN l.nama_lab
+          WHEN p.ruangan_id IS NOT NULL AND p.ruangan_id > 0 
+               THEN r.nama_ruangan
+          ELSE 'Tidak Diketahui'
+      END AS nama_entitas,
       p.tanggal_pinjam, 
       p.jam_mulai, 
-      p.jam_selesai, 
-      p.keperluan, 
-      p.jumlah_peserta, 
+      p.jam_selesai AS jam_selesai,
+      p.keperluan AS keperluan,
+      p.jumlah_peserta AS jumlah_peserta,
       p.status, 
       p.created_at
   FROM peminjaman p
   LEFT JOIN ruangan r ON p.ruangan_id = r.id_ruangan
   LEFT JOIN laboratorium l ON p.lab_id = l.id_lab
-  WHERE p.mahasiswa_id = ?
+  WHERE p.mahasiswa_id = ?  -- NAMA KOLOM YANG SUDAH BENAR
   ORDER BY p.created_at DESC
 ";
 
@@ -45,14 +53,14 @@ $result = mysqli_stmt_get_result($stmt);
   <h4 class="fw-bold mb-3">📋 Riwayat Peminjaman</h4>
 
   <?php
-  // --- alert dari session ---
   if (isset($_SESSION['alert'])) {
     $alert = $_SESSION['alert'];
     echo "<script>
           Swal.fire({
               icon: '{$alert['icon']}',
               title: '{$alert['title']}',
-              html: '{$alert['text']}'
+              html: '{$alert['text']}',
+              confirmButtonColor: '#3085d6'
           });
       </script>";
     unset($_SESSION['alert']);
@@ -74,45 +82,53 @@ $result = mysqli_stmt_get_result($stmt);
             <th>Status</th>
           </tr>
         </thead>
-    <tbody>
-        <?php
-        if (mysqli_num_rows($result) > 0) {
+        <tbody>
+          <?php
+          if (mysqli_num_rows($result) > 0) {
             $no = 1;
             while ($row = mysqli_fetch_assoc($result)) {
-                
-                // 1. Tentukan status dari DB. Jika NULL atau kosong, gunakan 'status_invalid'.
-                $status_db = trim($row['status'] ?? ''); // Hilangkan spasi di awal/akhir
-                if (empty($status_db)) {
-                    $status_db = 'status_invalid';
-                }
+              $status_db = trim($row['status'] ?? '');
 
-                $badge = match ($status_db) {
-                    'menunggu' => 'warning',
-                    'disetujui' => 'success',
-                    'ditolak' => 'danger',
-                    'dibatalkan' => 'secondary',
-                    'status_invalid' => 'dark', // Status tidak valid/kosong
-                    default => 'info' // Jika ada status baru selain daftar di atas
-                };
-                
-                // 2. Tentukan teks yang akan ditampilkan di dalam badge
-                $display_status = ($status_db === 'status_invalid') ? 'Cek Data' : $status_db;
+              // PERBAIKAN: Handle status 'menunggu' (bukan 'menungga')
+              if ($status_db === 'menunggu') {
+                $display_status = 'Menunggu';
+                $badge = 'warning';
+              } elseif (empty($status_db) || $status_db === '') {
+                $display_status = 'Cek Data';
+                $badge = 'dark';
+              } else {
+                // Mapping status ke badge warna
+                $badge_map = [
+                  'menunggu' => 'warning',
+                  'disetujui' => 'success',
+                  'ditolak' => 'danger',
+                  'dibatalkan' => 'secondary',
+                  'selesai' => 'info'
+                ];
 
-                echo "
+                $badge = $badge_map[strtolower($status_db)] ?? 'info';
+                $display_status = ucfirst($status_db);
+              } 
+
+              // Format waktu dengan benar
+              $jam_mulai = date('H:i', strtotime($row['jam_mulai']));
+              $jam_selesai = date('H:i', strtotime($row['jam_selesai']));
+              $waktu = $jam_mulai . ' - ' . $jam_selesai;
+
+              echo "
                     <tr>
                         <td>{$no}</td>
                         <td>{$row['tipe']}</td>
                         <td>{$row['nama_entitas']}</td>
                         <td>{$row['tanggal_pinjam']}</td>
-                        <td>{$row['jam_mulai']} - {$row['jam_selesai']}</td>
+                        <td>{$waktu}</td>
                         <td>{$row['keperluan']}</td>
                         <td>{$row['jumlah_peserta']}</td>
-                        <td><span class='badge bg-{$badge} text-capitalize'>{$display_status}</span></td>
+                        <td><span class='badge bg-{$badge}'>{$display_status}</span></td>
                     </tr>";
-                $no++;
+              $no++;
             }
-        } 
-         else {
+          } else {
             echo "
               <tr>
                   <td colspan='8' class='text-center text-muted py-4'>

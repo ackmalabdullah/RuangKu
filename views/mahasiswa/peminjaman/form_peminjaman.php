@@ -6,124 +6,160 @@ require '../../../partials/mahasiswa/navbar.php';
 
 // Pastikan koneksi tersedia dan berhasil
 if (!isset($koneksi) || $koneksi->connect_error) {
-    die("<div class='alert alert-danger'>Koneksi database gagal atau tidak ditemukan.</div>");
+    die("<div class='alert alert-danger text-center'>Koneksi database gagal atau tidak ditemukan. Hubungi administrator.</div>");
 }
 
-// --- 1. Ambil Parameter dari URL dan Sanitasi ---
-$tipe_entitas = isset($_GET['tipe']) ? strtolower(trim($_GET['tipe'])) : ''; // Sanitasi tipe
-$entitas_id = isset($_GET['id_entitas']) ? (int)$_GET['id_entitas'] : 0;
+// ================================================
+// 1. Ambil dan sanitasi parameter dari URL
+// ================================================
+$tipe_entitas   = isset($_GET['tipe']) ? strtolower(trim($_GET['tipe'])) : '';
+$entitas_id     = isset($_GET['id_entitas']) ? (int)$_GET['id_entitas'] : 0;
 $tanggal_pinjam = isset($_GET['tanggal']) ? trim($_GET['tanggal']) : '';
 
-// Redirect jika data tidak lengkap atau tipe tidak valid
+// Validasi parameter wajib
 if ($entitas_id == 0 || empty($tanggal_pinjam) || !in_array($tipe_entitas, ['ruangan', 'laboratorium'])) {
+    $_SESSION['alert'] = [
+        'icon'  => 'error',
+        'title' => 'Akses Ditolak',
+        'text'  => 'Parameter tidak lengkap atau tidak valid.'
+    ];
     header('Location: peminjaman.php');
     exit();
 }
 
-// --- 2. Tentukan Variabel Berdasarkan Tipe Entitas ---
-if ($tipe_entitas == 'ruangan') {
-    $tabel_entitas = 'ruangan';
-    $kolom_id = 'id_ruangan';
-    $kolom_nama = 'nama_ruangan';
+// ================================================
+// 2. Tentukan tabel, kolom, dan action URL berdasarkan tipe
+// ================================================
+if ($tipe_entitas === 'ruangan') {
+    $tabel_entitas        = 'ruangan';
+    $kolom_id             = 'id_ruangan';
+    $kolom_nama           = 'nama_ruangan';
     $nama_entitas_kapital = 'Ruangan';
-} else { // laboratorium
-    $tabel_entitas = 'laboratorium';
-    $kolom_id = 'id_lab';
-    $kolom_nama = 'nama_lab';
+    $action_proses        = 'proses_peminjaman_ruangan.php'; // KHUSUS RUANGAN
+} else {
+    $tabel_entitas        = 'laboratorium';
+    $kolom_id             = 'id_lab';
+    $kolom_nama           = 'nama_lab';
     $nama_entitas_kapital = 'Laboratorium';
+    $action_proses        = 'proses_peminjaman_lab.php';     // KHUSUS LAB
 }
 
-// --- 3. Ambil Nama Entitas (Ruangan atau Lab) menggunakan Prepared Statement ---
-// Perbaikan: Menggunakan Prepared Statement untuk keamanan (mencegah SQL Injection pada $entitas_id)
+// ================================================
+// 3. Ambil nama entitas (ruangan/lab) dengan prepared statement
+// ================================================
 $nama_entitas = 'Tidak diketahui';
-$sql_nama_entitas = "SELECT {$kolom_nama} FROM {$tabel_entitas} WHERE {$kolom_id} = ?";
-$stmt = mysqli_prepare($koneksi, $sql_nama_entitas);
+$error_nama   = false;
 
-if ($stmt) {
+$sql_nama = "SELECT {$kolom_nama} FROM {$tabel_entitas} WHERE {$kolom_id} = ? LIMIT 1";
+if ($stmt = mysqli_prepare($koneksi, $sql_nama)) {
     mysqli_stmt_bind_param($stmt, 'i', $entitas_id);
     mysqli_stmt_execute($stmt);
-    $result_nama = mysqli_stmt_get_result($stmt);
+    $result = mysqli_stmt_get_result($stmt);
 
-    if ($result_nama && mysqli_num_rows($result_nama) > 0) {
-        $row = mysqli_fetch_assoc($result_nama);
+    if ($result && mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_assoc($result);
         $nama_entitas = $row[$kolom_nama];
+    } else {
+        $error_nama = true;
     }
     mysqli_stmt_close($stmt);
 } else {
-    // Log error jika prepared statement gagal
-    error_log("Gagal membuat prepared statement untuk ambil nama entitas: " . mysqli_error($koneksi));
+    error_log("Prepared statement gagal (ambil nama): " . mysqli_error($koneksi));
+    $error_nama = true;
 }
 
-// Format tanggal untuk tampilan menggunakan IntlDateFormatter
-// Perbaikan: Pengecekan class sebelum inisialisasi
+if ($error_nama) {
+    $_SESSION['alert'] = [
+        'icon'  => 'error',
+        'title' => 'Data Tidak Ditemukan',
+        'text'  => 'Ruangan atau laboratorium tidak ditemukan di database.'
+    ];
+    header('Location: peminjaman.php');
+    exit();
+}
+
+// ================================================
+// 4. Format tanggal Indonesia yang cantik
+// ================================================
 if (class_exists('IntlDateFormatter')) {
     try {
-        $formatter = new IntlDateFormatter('id_ID', IntlDateFormatter::FULL, IntlDateFormatter::NONE);
+        $formatter = new IntlDateFormatter(
+            'id_ID',
+            IntlDateFormatter::FULL,
+            IntlDateFormatter::NONE,
+            'Asia/Jakarta',
+            IntlDateFormatter::GREGORIAN
+        );
         $tanggal_terformat = $formatter->format(new DateTime($tanggal_pinjam));
     } catch (Exception $e) {
-        // Fallback jika formatting tanggal gagal
-        $tanggal_terformat = date('d F Y', strtotime($tanggal_pinjam));
-        error_log("IntlDateFormatter gagal: " . $e->getMessage());
+        $tanggal_terformat = date('l, d F Y', strtotime($tanggal_pinjam));
     }
 } else {
-    // Fallback jika Intl extension tidak aktif
-    $tanggal_terformat = date('d F Y', strtotime($tanggal_pinjam));
-    echo "<script>console.warn('Ekstensi PHP intl tidak diaktifkan. Tanggal ditampilkan dengan format standar.');</script>";
+    $tanggal_terformat = date('l, d F Y', strtotime($tanggal_pinjam));
 }
-
 ?>
 
 <div class="container my-5">
-    <div class="card shadow-lg border-0 rounded-4">
-        <div class="card-body p-md-5">
-            <h3 class="mb-4 text-danger fw-bold">📝 Form Peminjaman <?= htmlspecialchars($nama_entitas_kapital) ?></h3>
+    <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+        <div class="card-header bg-danger text-white text-center py-4">
+            <h2 class="mb-0 fw-bold">Form Pengajuan Peminjaman <?= htmlspecialchars($nama_entitas_kapital) ?></h2>
+        </div>
+        <div class="card-body p-4 p-md-5">
 
-            <div class="alert alert-warning border-0 shadow-sm">
-                Anda akan meminjam **<?= htmlspecialchars($nama_entitas) ?>** pada tanggal
-                <strong class="text-danger"><?= htmlspecialchars($tanggal_terformat) ?></strong>.
+            <!-- Info Peminjaman -->
+            <div class="alert alert-info border-0 shadow-sm mb-4">
+                <h5 class="mb-2">Informasi Peminjaman:</h5>
+                <p class="mb-0">
+                    Anda akan mengajukan peminjaman <strong class="text-danger"><?= htmlspecialchars($nama_entitas) ?></strong><br>
+                    pada hari <strong class="text-primary"><?= htmlspecialchars($tanggal_terformat) ?></strong>.
+                </p>
             </div>
 
-            <form id="formPeminjaman" action="proses_peminjaman.php" method="POST" class="needs-validation" novalidate>
+            <!-- Form Peminjaman -->
+            <form id="formPeminjaman" action="<?= htmlspecialchars($action_proses) ?>" method="POST" class="needs-validation" novalidate>
 
+                <!-- Hidden Inputs -->
                 <input type="hidden" name="tipe_entitas" value="<?= htmlspecialchars($tipe_entitas) ?>">
-                <input type="hidden" name="entitas_id" value="<?= htmlspecialchars($entitas_id) ?>">
+                <input type="hidden" name="entitas_id" value="<?= $entitas_id ?>">
                 <input type="hidden" name="tanggal_pinjam" value="<?= htmlspecialchars($tanggal_pinjam) ?>">
 
-                <div class="row">
+                <!-- Jam Mulai & Selesai -->
+                <div class="row g-4 mb-4">
                     <div class="col-md-6">
-                        <div class="mb-3">
-                            <label for="jam_mulai" class="form-label">Jam Mulai</label>
-                            <input type="time" class="form-control" id="jam_mulai" name="jam_mulai" required>
-                            <div class="invalid-feedback">Jam mulai harus diisi.</div>
-                        </div>
+                        <label for="jam_mulai" class="form-label fw-semibold">Jam Mulai <span class="text-danger">*</span></label>
+                        <input type="time" class="form-control form-control-lg" id="jam_mulai" name="jam_mulai" required>
+                        <div class="invalid-feedback">Jam mulai wajib diisi.</div>
                     </div>
                     <div class="col-md-6">
-                        <div class="mb-3">
-                            <label for="jam_selesai" class="form-label">Jam Selesai</label>
-                            <input type="time" class="form-control" id="jam_selesai" name="jam_selesai" required>
-                            <div class="invalid-feedback">Jam selesai harus diisi.</div>
-                        </div>
+                        <label for="jam_selesai" class="form-label fw-semibold">Jam Selesai <span class="text-danger">*</span></label>
+                        <input type="time" class="form-control form-control-lg" id="jam_selesai" name="jam_selesai" required>
+                        <div class="invalid-feedback">Jam selesai wajib diisi dan harus lebih besar dari jam mulai.</div>
                     </div>
                 </div>
 
-                <div class="mb-3">
-                    <label for="keperluan" class="form-label">Keperluan (Kegiatan)</label>
-                    <textarea class="form-control" id="keperluan" name="keperluan" rows="3" placeholder="Contoh: Diskusi kelompok matakuliah Algoritma Pemrograman" required></textarea>
-                    <div class="invalid-feedback">Keperluan harus diisi.</div>
-                </div>
-
+                <!-- Keperluan -->
                 <div class="mb-4">
-                    <label for="jumlah_peserta" class="form-label">Jumlah Peserta</label>
-                    <input type="number" class="form-control" id="jumlah_peserta" name="jumlah_peserta" placeholder="Masukkan jumlah peserta" min="1" required>
-                    <div class="invalid-feedback">Jumlah peserta harus diisi dan minimal 1.</div>
+                    <label for="keperluan" class="form-label fw-semibold">Keperluan / Kegiatan <span class="text-danger">*</span></label>
+                    <textarea class="form-control" id="keperluan" name="keperluan" rows="4" 
+                              placeholder="Contoh: Praktikum Pemrograman Web, Diskusi Tugas Akhir, dll" required></textarea>
+                    <div class="invalid-feedback">Keperluan wajib diisi dengan jelas.</div>
                 </div>
 
-                <div class="d-flex justify-content-between pt-3 border-top">
-                    <a href="peminjaman.php" class="btn btn-outline-secondary">
-                        ← Kembali ke Pilihan
+                <!-- Jumlah Peserta -->
+                <div class="mb-5">
+                    <label for="jumlah_peserta" class="form-label fw-semibold">Jumlah Peserta <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control form-control-lg" id="jumlah_peserta" name="jumlah_peserta" 
+                               min="1" max="100" placeholder="Masukkan jumlah peserta" required>
+                    <div class="invalid-feedback">Jumlah peserta minimal 1 orang.</div>
+                </div>
+
+                <!-- Tombol -->
+                <div class="d-flex flex-column flex-md-row justify-content-between gap-3 pt-4 border-top">
+                    <a href="peminjaman.php" class="btn btn-outline-secondary btn-lg px-5">
+                        Kembali
                     </a>
-                    <button type="submit" class="btn btn-danger fw-bold">
-                        <i class="bi bi-calendar-check"></i> Ajukan Peminjaman
+                    <button type="submit" class="btn btn-danger btn-lg px-5 fw-bold shadow-sm">
+                        Ajukan Peminjaman
                     </button>
                 </div>
             </form>
@@ -131,64 +167,58 @@ if (class_exists('IntlDateFormatter')) {
     </div>
 </div>
 
+<!-- SweetAlert2 + Validasi JS -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 <script>
-    // Validasi form Bootstrap dan Konfirmasi SweetAlert
     (() => {
         'use strict'
         const form = document.getElementById('formPeminjaman');
+
         form.addEventListener('submit', function(event) {
-            // Periksa validitas input bawaan HTML
+            // Reset invalid state
+            document.getElementById('jam_selesai').classList.remove('is-invalid');
+
             if (!form.checkValidity()) {
-                event.preventDefault()
-                event.stopPropagation()
+                event.preventDefault();
+                event.stopPropagation();
             } else {
-                // Lakukan validasi jam_mulai vs jam_selesai di sisi klien
-                const jamMulai = document.getElementById('jam_mulai').value;
+                const jamMulai   = document.getElementById('jam_mulai').value;
                 const jamSelesai = document.getElementById('jam_selesai').value;
-                
-                if (jamMulai === "" || jamSelesai === "") {
-                    // Biarkan validasi HTML native yang menangani jika kosong
-                } else if (jamMulai >= jamSelesai) {
+
+                if (jamMulai >= jamSelesai) {
                     event.preventDefault();
-                    event.stopPropagation();
-                    // Tampilkan pesan error custom
+                    document.getElementById('jam_selesai').classList.add('is-invalid');
                     Swal.fire({
                         icon: 'warning',
-                        title: 'Waktu Tidak Valid',
-                        text: 'Jam selesai harus lebih besar dari jam mulai.',
+                        title: 'Waktu Tidak Valid!',
+                        text: 'Jam selesai harus lebih besar dari jam mulai ya sayang',
+                        confirmButtonColor: '#dc3545'
                     });
-                    
-                    // Tambahkan class invalid pada input jam_selesai
-                    document.getElementById('jam_selesai').classList.add('is-invalid');
-                    document.getElementById('jam_selesai').focus();
-
-                } else {
-                    // Jika valid, tampilkan konfirmasi SweetAlert
-                    event.preventDefault();
-                    Swal.fire({
-                        title: 'Konfirmasi Peminjaman',
-                        text: 'Apakah Anda yakin ingin mengajukan peminjaman ini? Data akan dikirim untuk diverifikasi.',
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonText: 'Ya, ajukan',
-                        cancelButtonText: 'Batal',
-                        confirmButtonColor: '#dc3545', // Warna Merah (danger)
-                        cancelButtonColor: '#6c757d' // Warna Abu-abu (secondary)
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            form.submit();
-                        }
-                    });
+                    return false;
                 }
+
+                // Konfirmasi sebelum kirim
+                event.preventDefault();
+                Swal.fire({
+                    title: 'Yakin Mau Ajukan?',
+                    html: `Kamu akan mengajukan peminjaman <b><?= htmlspecialchars($nama_entitas) ?></b> pada <b><?= htmlspecialchars($tanggal_terformat) ?></b>`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, Ajukan Sekarang!',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
             }
-            form.classList.add('was-validated')
-        }, false)
+
+            form.classList.add('was-validated');
+        }, false);
     })();
 </script>
 
-<?php
-// Perbaikan: Hapus pengecekan class IntlDateFormatter di sini, sudah dilakukan di bagian atas.
-require '../../../partials/mahasiswa/footer.php';
-?>
+<?php require '../../../partials/mahasiswa/footer.php'; ?>
