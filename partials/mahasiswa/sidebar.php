@@ -124,6 +124,13 @@ function isActive($menuPageName)
           </a>
         </li>
 
+        <li class="menu-item <?php echo isActive('mahasiswa.php'); ?>">
+          <a href="../mahasiswa/mahasiswa.php" class="menu-link">
+            <i class="menu-icon tf-icons bx bx-book-bookmark"></i>
+            <div>CRUD Mahasiswa</div>
+          </a>
+        </li>
+
         <li class="menu-item <?php echo isActive('prodi.php'); ?>">
           <a href="../prodi/prodi.php" class="menu-link">
             <i class="menu-icon tf-icons bx bx-book-bookmark"></i>
