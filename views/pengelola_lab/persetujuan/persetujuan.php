@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const actionButtons = document.querySelectorAll('.action-btn');
-    const prosesUrl = '../../../pengelola_ruangan/persetujuan/proses_persetujuan.php';
+    const prosesUrl = 'proses_persetujuan.php';
 
     actionButtons.forEach(button => {
         button.addEventListener('click', function () {
