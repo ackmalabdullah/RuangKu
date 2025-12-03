@@ -1,0 +1,18 @@
+[03-Dec-2025 09:28:34 Europe/Berlin] ==========================================
+[03-Dec-2025 09:28:34 Europe/Berlin] PROSES PEMINJAMAN RUANGAN - 2025-12-03 09:28:34
+[03-Dec-2025 09:28:34 Europe/Berlin]   POST[tipe_entitas] = ruangan
+[03-Dec-2025 09:28:34 Europe/Berlin]   POST[entitas_id] = 2
+[03-Dec-2025 09:28:34 Europe/Berlin]   POST[tanggal_pinjam] = 2025-12-06
+[03-Dec-2025 09:28:34 Europe/Berlin]   POST[jam_mulai] = 15:28
+[03-Dec-2025 09:28:34 Europe/Berlin]   POST[jam_selesai] = 17:28
+[03-Dec-2025 09:28:34 Europe/Berlin]   POST[keperluan] = bismillah
+[03-Dec-2025 09:28:34 Europe/Berlin]   POST[jumlah_peserta] = 12
+[03-Dec-2025 09:28:34 Europe/Berlin] Session mahasiswa_id: 1
+[03-Dec-2025 09:28:34 Europe/Berlin] ==========================================
+[03-Dec-2025 09:28:35 Europe/Berlin] Cek ruangan ID: 2
+[03-Dec-2025 09:28:35 Europe/Berlin] Ruangan ditemukan: 3.4
+[03-Dec-2025 09:28:35 Europe/Berlin] Cek konflik jadwal ruangan...
+[03-Dec-2025 09:28:35 Europe/Berlin] Tidak ada konflik
+[03-Dec-2025 09:28:35 Europe/Berlin] Berhasil insert peminjaman ID: 33
+[03-Dec-2025 09:28:35 Europe/Berlin] Berhasil insert jadwal_ruangan
+[03-Dec-2025 09:28:35 Europe/Berlin] TRANSAKSI RUANGAN BERHASIL
