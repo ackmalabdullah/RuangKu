@@ -44,8 +44,6 @@ if ($tipe_entitas == 'ruangan') {
     exit();
 }
 
-
-// --- 3. Ambil Daftar Semua Entitas (Ruangan atau Lab) ---
 // --- 3. Ambil Daftar Semua Entitas (TANPA DUMMY SISTEM) ---
 $sql_list = "SELECT {$kolom_id}, {$kolom_nama} 
              FROM {$tabel_entitas} 

@@ -165,6 +165,38 @@ function isActive($menuPageName)
       <?php endif; ?>
 
 
+      <?php if ($role == 'jurusan') : ?>
+        <li class="menu-header small text-uppercase">
+          <span class="menu-header-text">Administrator</span>
+        </li>
+
+        <li class="menu-item <?php echo isActive('dashboard.php'); ?>">
+          <a href="../dashboard/dashboard.php" class="menu-link">
+            <i class="menu-icon tf-icons bxs-dashboard"></i>
+            <div>Dashboard (Admin)</div>
+          </a>
+        </li>
+
+        <li class="menu-item <?php echo isActive('persetujuan.php'); ?>">
+          <a href="../persetujuan/persetujuan.php" class="menu-link">
+            <i class="menu-icon tf-icons bx bx-user-pin"></i>
+            <div>Persetujuan</div>
+          </a>
+        </li>
+
+        <li class="menu-header small text-uppercase">
+          <span class="menu-header-text">Logout</span>
+        </li>
+
+        <li class="menu-item">
+          <a href="../../auth/logout.php" class="menu-link">
+            <i class="menu-icon tf-icons bx bx-log-out"></i>
+            <div>Logout</div>
+          </a>
+        </li>
+      <?php endif; ?>
+
+
       <?php if ($role == 'pengelola_lab') : ?>
         <li class="menu-header small text-uppercase">
           <span class="menu-header-text">Pengelola</span>

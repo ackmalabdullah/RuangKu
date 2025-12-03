@@ -67,7 +67,7 @@
         <p>Belum punya akun? <a href="register.php">Daftar di sini</a></p>
       </div>
       <div class="support-link">
-        <p>Login Sebagai Admin atau Pengelola <a href="login.php">Login di sini</a></p>
+        <p>Login Sebagai Admin, Pengelola, dan Jurusan <a href="login.php">Login di sini</a></p>
       </div>
     </form>
   </div>

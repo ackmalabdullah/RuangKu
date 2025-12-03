@@ -1,8 +1,9 @@
 <?php
-// FILE: views/pengelola_ruangan/persetujuan/persetujuan.php
+// FILE: views/jurusan/persetujuan/persetujuan.php
 
-$required_role = 'pengelola_ruangan';
+$required_role = 'jurusan'; // HARUS 'jurusan'
 
+// Ganti partials: HARUS menggunakan partials milik Jurusan
 require '../../../partials/mahasiswa/header.php'; 
 require '../../../partials/mahasiswa/sidebar.php'; 
 require '../../../partials/mahasiswa/navbar.php'; 
@@ -14,7 +15,8 @@ if (!isset($koneksi)) {
     $koneksi = $db->conn;
 }
 
-// >>> KOREKSI 2: QUERY SQL MENAMBAHKAN status_jurusan = 'disetujui' <<<
+
+// >>> KOREKSI QUERY SQL UTAMA: Filter berdasarkan status_jurusan <<<
 $sql = "
     SELECT 
         p.id_peminjaman,
@@ -29,10 +31,9 @@ $sql = "
     FROM peminjaman p
     INNER JOIN ruangan r ON p.ruangan_id = r.id_ruangan
     INNER JOIN mahasiswa m ON p.mahasiswa_id = m.id_mahasiswa
-    -- FILTER UTAMA PENGELOLA RUANGAN: Sudah disetujui Jurusan DAN menunggu persetujuan final
-    WHERE p.status = 'menunggu' 
-      AND p.ruangan_id IS NOT NULL
-      AND p.status_jurusan = 'disetujui' 
+    -- KOREKSI FILTER: Harus status_jurusan 'menunggu'
+    WHERE p.status_jurusan = 'menunggu' 
+      AND p.ruangan_id IS NOT NULL 
     ORDER BY p.created_at ASC
 ";
 
@@ -57,8 +58,8 @@ if (isset($_SESSION['alert'])):
 <?php endif; ?>
 
 <div class="container my-5">
-    <h2 class="fw-bold mb-4 text-primary">✅ Persetujuan Peminjaman Ruangan (Tahap Final)</h2>
-    <p class="text-muted">Daftar permintaan peminjaman ruangan yang **sudah diverifikasi Jurusan** dan memerlukan persetujuan jadwal.</p>
+    <h2 class="fw-bold mb-4 text-primary">✅ Persetujuan Peminjaman Ruangan (Tahap Jurusan)</h2>
+    <p class="text-muted">Daftar permintaan peminjaman ruangan yang memerlukan verifikasi dan persetujuan **Administratif** Jurusan.</p>
     
     <div class="card shadow-sm">
         <div class="card-body">
@@ -109,7 +110,7 @@ if (isset($_SESSION['alert'])):
                         <?php else: ?>
                             <tr>
                                 <td colspan="8" class="text-center text-info py-4">
-                                    <i class="bi bi-info-circle-fill"></i> Tidak ada permintaan peminjaman ruangan yang menunggu persetujuan akhir saat ini.
+                                    <i class="bi bi-info-circle-fill"></i> Tidak ada permintaan peminjaman ruangan yang menunggu persetujuan Jurusan saat ini.
                                 </td>
                             </tr>
                         <?php endif; ?>
@@ -124,18 +125,20 @@ if (isset($_SESSION['alert'])):
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const actionButtons = document.querySelectorAll('.action-btn');
+        // PASTIKAN JALUR INI BENAR KE PROSES DI FOLDER YANG SAMA
         const prosesUrl = 'proses_persetujuan.php'; 
 
         actionButtons.forEach(button => {
             button.addEventListener('click', function() {
                 const id = this.dataset.id;
-                const action = this.dataset.action;
-                const entityName = this.dataset.entity; // Nama Ruangan
+                const action = this.dataset.action; // 'disetujui' atau 'ditolak'
+                const entityName = this.dataset.entity;
                 
-                const title = action === 'disetujui' ? 'Setujui Peminjaman?' : 'Tolak Peminjaman?';
+                // Judul dan teks harus mencerminkan persetujuan Jurusan, bukan final
+                const title = action === 'disetujui' ? 'Setujui Pengajuan?' : 'Tolak Pengajuan?';
                 const text = action === 'disetujui' 
-                    ? `Anda akan **MENYETUJUI** peminjaman ruangan **${entityName}**. Slot waktu akan dikunci dan peminjaman dianggap **SAH**.`
-                    : `Anda akan **MENOLAK** peminjaman ruangan **${entityName}**. Proses akan dibatalkan.`;
+                    ? `Anda akan **MENYETUJUI** peminjaman ini. Pengajuan akan diteruskan ke **Pengelola Ruangan** untuk persetujuan akhir.`
+                    : `Anda akan **MENOLAK** peminjaman ini. Proses pengajuan akan dibatalkan.`;
                 const confirmButtonColor = action === 'disetujui' ? '#28a745' : '#dc3545';
                 const confirmButtonText = action === 'disetujui' ? 'Ya, Setujui' : 'Ya, Tolak';
 
@@ -162,7 +165,7 @@ if (isset($_SESSION['alert'])):
 
                         const actionInput = document.createElement('input');
                         actionInput.type = 'hidden';
-                        actionInput.name = 'action';
+                        actionInput.name = 'action'; // Mengirim variabel 'action'
                         actionInput.value = action; 
 
                         form.appendChild(idInput);
@@ -177,7 +180,7 @@ if (isset($_SESSION['alert'])):
 </script>
 
 <?php
-// >>> KOREKSI 3: Ganti partials dari 'mahasiswa' ke 'pengelola_ruangan' (sesuaikan path Anda) <<<
+// Ganti partials: HARUS menggunakan partials milik Jurusan
 require '../../../partials/mahasiswa/footer.php';
 mysqli_close($koneksi);
 ?>
