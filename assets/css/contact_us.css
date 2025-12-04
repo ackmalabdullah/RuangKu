@@ -1,0 +1,80 @@
+/* ===========================
+   CONTACT SECTION FINAL
+=========================== */
+#contact-us {
+    padding-top: 100px;   /* jarak dari section sebelumnya */
+    padding-bottom: 160px; /* jarak bawah */
+    background-color: #F0F3FA;
+    position: relative;
+    z-index: 1;
+}
+
+#contact-us .contact-title {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 10px; /* jarak ke tagline */
+    color: #1e1e1e;
+    text-align: center;
+}
+
+#contact-us .contact-tagline {
+    font-size: 16px;
+    color: #555;
+    text-align: center;
+    margin-bottom: 40px; /* jarak ke form */
+}
+
+.contact-container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.contact-form .input-group {
+    text-align: left;
+    margin-bottom: 20px; /* jarak antar input */
+}
+
+.contact-form .input-group label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.contact-form input,
+.contact-form textarea {
+    width: 100%;
+    padding: 15px 20px;
+    border-radius: 25px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    font-family: 'Poppins', sans-serif;
+    outline: none;
+    text-align: justify; /* teks rata kanan-kiri di input/textarea */
+    box-sizing: border-box;
+}
+
+.contact-form textarea {
+    height: 150px;
+    resize: none;
+    padding: 20px;
+}
+
+.contact-form .form-button {
+    text-align: center; /* tombol di tengah */
+    margin-top: 30px; /* jarak tombol ke input terakhir */
+}
+
+.contact-form button.btn-check {
+    background-color: #3B5998; 
+    color: #fff;
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.contact-form button.btn-check:hover {
+    background-color: #4d9ee0
+}
