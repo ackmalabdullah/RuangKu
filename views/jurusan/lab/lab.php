@@ -1,5 +1,5 @@
 <?php
-$required_role = 'pengelola_lab';
+$required_role = 'jurusan';
 
 // Memuat komponen layout
 require '../../../partials/mahasiswa/header.php';
