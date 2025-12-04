@@ -9,12 +9,26 @@ require '../../../partials/mahasiswa/navbar.php';
 $database = new Database();
 $conn = $database->conn;
 
-// Query mahasiswa + join prodi
+// Ambil filter SEBELUM query
+$filter_prodi = isset($_GET['filter_prodi']) ? $_GET['filter_prodi'] : '';
+$filter_angkatan = isset($_GET['filter_angkatan']) ? $_GET['filter_angkatan'] : '';
+
+$where = " WHERE 1=1 ";
+
+if (!empty($filter_prodi)) {
+    $where .= " AND m.prodi_id = '$filter_prodi' ";
+}
+
+if (!empty($filter_angkatan)) {
+    $where .= " AND m.angkatan = '$filter_angkatan' ";
+}
+
 $query = mysqli_query($conn, "
     SELECT m.id_mahasiswa, m.nim, m.nama, m.email, m.angkatan, m.foto,
            p.nama_prodi
     FROM mahasiswa m
     LEFT JOIN prodi p ON p.id_prodi = m.prodi_id
+    $where
     ORDER BY m.nama ASC
 ");
 ?>
@@ -33,6 +47,51 @@ $query = mysqli_query($conn, "
           <i class="bx bx-printer me-1"></i> Cetak PDF
         </a>
       </div>
+
+  <?php
+// Ambil prodi untuk dropdown filter
+$prodi_filter = mysqli_query($conn, "SELECT * FROM prodi");
+
+// Ambil nilai filter dari URL (jika ada)
+$filter_prodi = isset($_GET['filter_prodi']) ? $_GET['filter_prodi'] : '';
+$filter_angkatan = isset($_GET['filter_angkatan']) ? $_GET['filter_angkatan'] : '';
+?>
+
+<!-- FILTER -->
+<div class="card p-3 mb-4">
+  <form method="GET" class="row g-3">
+
+    <!-- Filter Prodi -->
+    <div class="col-md-4">
+      <label class="form-label">Program Studi</label>
+      <select name="filter_prodi" class="form-select">
+        <option value="">Semua Prodi</option>
+
+        <?php while ($pf = mysqli_fetch_assoc($prodi_filter)): ?>
+          <option value="<?= $pf['id_prodi']; ?>"
+                  <?= ($filter_prodi == $pf['id_prodi']) ? 'selected' : ''; ?> >
+              <?= $pf['nama_prodi']; ?>
+          </option>
+        <?php endwhile; ?>
+      </select>
+    </div>
+
+    <!-- Filter Angkatan -->
+    <div class="col-md-4">
+      <label class="form-label">Angkatan</label>
+      <input type="number" name="filter_angkatan" class="form-control"
+             value="<?= $filter_angkatan; ?>" placeholder="Contoh: 2022">
+    </div>
+
+    <!-- Tombol -->
+    <div class="col-md-4 d-flex align-items-end">
+      <button type="submit" class="btn btn-primary w-100">
+        <i class="bx bx-filter-alt me-1"></i> Terapkan Filter
+      </button>
+    </div>
+
+  </form>
+</div>
 
       <div class="table-responsive">
         <table class="table table-bordered table-hover">
