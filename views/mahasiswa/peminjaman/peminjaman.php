@@ -1,20 +1,20 @@
 <?php
 $required_role = 'mahasiswa';
+
 require '../../../partials/mahasiswa/header.php';
 require '../../../partials/mahasiswa/sidebar.php';
 require '../../../partials/mahasiswa/navbar.php';
 
-// Pastikan koneksi tersedia
 if (!isset($koneksi)) {
-    die("<div class='alert alert-danger'>Koneksi database tidak ditemukan.</div>");
+    require '../../../settings/koneksi.php';
+    $db = new Database();
+    $koneksi = $db->conn;
 }
 
-// --- 1. Ambil Parameter dari URL ---
 $base_url = 'peminjaman.php';
 $tipe_entitas = isset($_GET['tipe']) ? $_GET['tipe'] : 'ruangan'; // Default: ruangan
 $entitas_id_selected = isset($_GET['id_entitas']) ? (int)$_GET['id_entitas'] : 0;
 
-// --- 2. Tentukan Variabel Berdasarkan Tipe Entitas ---
 if ($tipe_entitas == 'ruangan') {
     $tabel_entitas = 'ruangan';
     $kolom_id = 'id_ruangan';
@@ -22,21 +22,23 @@ if ($tipe_entitas == 'ruangan') {
     $kolom_status = 'status_ruangan';
     $tabel_fasilitas_junction = 'ruangan_fasilitas';
     $tabel_jadwal = 'jadwal_ruangan';
-    $id_fasilitas_fk = 'ruangan_id'; // FK di ruangan_fasilitas
-    $id_jadwal_fk = 'ruangan_id'; // FK di jadwal_ruangan
+    $id_fasilitas_fk = 'ruangan_id';
+    $id_jadwal_fk = 'ruangan_id';
     $nama_entitas_kapital = 'Ruangan';
     $folder_gambar = 'ruangan';
+    $proses_form = 'proses_peminjaman_ruangan.php';
 } elseif ($tipe_entitas == 'laboratorium') {
     $tabel_entitas = 'laboratorium';
     $kolom_id = 'id_lab';
     $kolom_nama = 'nama_lab';
     $kolom_status = 'status_lab';
     $tabel_fasilitas_junction = 'lab_fasilitas';
-    $tabel_jadwal = 'jadwal_lab'; // SESUAIKAN
+    $tabel_jadwal = 'jadwal_lab';
     $id_fasilitas_fk = 'lab_id';
-    $id_jadwal_fk = 'lab_id'; // SESUAIKAN
+    $id_jadwal_fk = 'lab_id';
     $nama_entitas_kapital = 'Laboratorium';
     $folder_gambar = 'lab';
+    $proses_form = 'proses_peminjaman_lab.php';
 } else {
     // Jika tipe tidak valid, reset ke default
     $tipe_entitas = 'ruangan';
@@ -53,12 +55,10 @@ $sql_list = "SELECT {$kolom_id}, {$kolom_nama}
              ORDER BY {$kolom_nama}";
 $result_list = mysqli_query($koneksi, $sql_list);
 
-// --- 4. Ambil Detail Entitas, Fasilitas, dan Jadwal (Jika Entitas dipilih) ---
 $detail = null;
 $events_json = '[]';
 
 if ($entitas_id_selected > 0) {
-    // a. Ambil detail entitas
     $sql_detail = "
         SELECT 
             r.{$kolom_nama},
@@ -74,7 +74,6 @@ if ($entitas_id_selected > 0) {
     $result_detail = mysqli_query($koneksi, $sql_detail);
     $detail = mysqli_fetch_assoc($result_detail);
 
-    // b. Ambil daftar fasilitas
     $sql_fasilitas = "
         SELECT f.nama_fasilitas, rf.jumlah
         FROM {$tabel_fasilitas_junction} rf
@@ -83,14 +82,12 @@ if ($entitas_id_selected > 0) {
     ";
     $result_fasilitas = mysqli_query($koneksi, $sql_fasilitas);
 
-    // c. Ambil data jadwal untuk Kalender
     $today = date('Y-m-d'); 
     
     $sql_jadwal = "
         SELECT tanggal_mulai, tanggal_selesai, jam_mulai, jam_selesai, status_jadwal 
         FROM {$tabel_jadwal} 
         WHERE {$id_jadwal_fk} = $entitas_id_selected
-        -- Tambahkan kondisi ini: Hanya ambil jadwal yang belum selesai (tanggal_selesai >= hari ini)
         AND tanggal_selesai >= '{$today}' 
         ORDER BY tanggal_mulai
     ";
@@ -98,13 +95,12 @@ if ($entitas_id_selected > 0) {
 
     $events = [];
     while ($row = mysqli_fetch_assoc($result_jadwal)) {
-        // Logika pewarnaan berdasarkan statusg
+        // Logika pewarnaan berdasarkan status
         $color = match ($row['status_jadwal']) {
-            'Perbaikan' => '#e74c3c',    // Merah (Blokir Keras)
-            'Diblokir' => '#8e44ad',     // Ungu (Blokir Keras)
-            'Dipakai' => '#f39c12',      // Oranye (Sedang Digunakan/Disetujui)
-            'Menunggu' => '#3498db',     // BIRU (Jadwal diajukan & sedang diproses) 
-            default => '#2ecc71',        // Hijau (Fallback)
+            'Perbaikan', 'Diblokir' => '#dc3545', // Merah (Keras/Primary Danger)
+            'Dipakai' => '#ffc107',              // Kuning (Sedang Digunakan/Warning)
+            'Menunggu' => '#0d6efd',             // Biru (Sedang Diproses/Primary Info) 
+            default => '#198754',                 // Hijau (Fallback/Success)
         };
 
         // FullCalendar memerlukan format YYYY-MM-DDTTHH:MM:SS
@@ -114,7 +110,7 @@ if ($entitas_id_selected > 0) {
             'end' => $row['tanggal_selesai'] . 'T' . $row['jam_selesai'],
             'backgroundColor' => $color,
             'borderColor' => $color,
-            'status' => $row['status_jadwal'] // Mempertahankan status
+            'status' => $row['status_jadwal']
         ];
     }
     $events_json = json_encode($events);
@@ -122,84 +118,161 @@ if ($entitas_id_selected > 0) {
 ?>
 
 <div class="container my-5">
-    <h2 class="fw-bold mb-4 text-primary">📚 Peminjaman: Pilih Jenis Ruangan</h2>
+    <h2 class="fw-bolder mb-3 text-dark"> Peminjaman: Cek Ketersediaan & Ajukan</h2>
+    <p class="text-muted mb-4">Pilih jenis entitas, lalu pilih spesifik ruangan/lab untuk melihat detail fasilitas dan jadwal.</p>
 
-    <div class="d-flex gap-3 mb-4">
-        <a href="<?= $base_url ?>?tipe=ruangan"
-            class="btn <?= $tipe_entitas == 'ruangan' ? 'btn-danger' : 'btn-outline-danger' ?> rounded-pill px-4 fw-bold shadow-sm">
-            <i class="bi bi-house-door-fill"></i> Ruangan
-        </a>
-        <a href="<?= $base_url ?>?tipe=laboratorium"
-            class="btn <?= $tipe_entitas == 'laboratorium' ? 'btn-danger' : 'btn-outline-danger' ?> rounded-pill px-4 fw-bold shadow-sm">
-            <i class="bi bi-tools"></i> Laboratorium
-        </a>
+    <div class="mb-5 border-bottom pb-3">
+        <h3 class="fw-bold fs-5 mb-3 text-primary"><i class="bi bi-bookmark-fill me-2"></i> Tipe Peminjaman</h3>
+        <div class="row g-3">
+            <div class="col-6 col-md-4 col-lg-3">
+                <a href="<?= $base_url ?>?tipe=ruangan"
+                    class="btn w-100 rounded-3 text-start shadow-sm py-3 px-4 <?= $tipe_entitas == 'ruangan' ? 'bg-primary text-white border-primary' : 'btn-outline-primary' ?> fw-semibold d-flex align-items-center justify-content-between">
+                    <span>
+                        <i class="bi bi-house-door-fill me-2 fs-5"></i> Ruangan
+                    </span>
+                    <i class="bi bi-chevron-right ms-auto"></i>
+                </a>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3">
+                <a href="<?= $base_url ?>?tipe=laboratorium"
+                    class="btn w-100 rounded-3 text-start shadow-sm py-3 px-4 <?= $tipe_entitas == 'laboratorium' ? 'bg-primary text-white border-primary' : 'btn-outline-primary' ?> fw-semibold d-flex align-items-center justify-content-between">
+                    <span>
+                        <i class="bi bi-tools me-2 fs-5"></i> Laboratorium
+                    </span>
+                    <i class="bi bi-chevron-right ms-auto"></i>
+                </a>
+            </div>
+        </div>
     </div>
-
-    <hr class="my-4">
-
-    <h3 class="fw-bold mb-4 text-secondary">Pilih <?= $nama_entitas_kapital ?></h3>
-
-    <div class="d-flex flex-wrap gap-2 mb-4">
-        <?php while ($entitas = mysqli_fetch_assoc($result_list)): ?>
-            <?php
-            $id = $entitas[$kolom_id];
-            $nama = $entitas[$kolom_nama];
-            $active = ($id == $entitas_id_selected);
-            $btnClass = $active ? 'btn-primary' : 'btn-outline-primary';
+    <div class="mb-5">
+        <h3 class="fw-bold fs-5 mb-3 text-secondary"><i class="bi bi-grid-fill me-2"></i> Pilih <?= $nama_entitas_kapital ?></h3>
+        <div class="row g-2">
+            <?php 
+            $entitas_list_count = mysqli_num_rows($result_list);
+            mysqli_data_seek($result_list, 0); // Reset pointer
+            $counter = 0;
+            while ($entitas = mysqli_fetch_assoc($result_list)): 
+                $counter++;
+                $id = $entitas[$kolom_id];
+                $nama = $entitas[$kolom_nama];
+                $active = ($id == $entitas_id_selected);
+                $btnClass = $active ? 'btn-primary shadow' : 'btn-outline-secondary';
             ?>
-            <a href="<?= $base_url ?>?tipe=<?= $tipe_entitas ?>&id_entitas=<?= $id ?>"
-                class="btn <?= $btnClass ?> rounded-pill px-3 fw-semibold shadow-sm">
-                <?= htmlspecialchars($nama) ?>
-            </a>
-        <?php endwhile; ?>
+            <div class="col-6 col-md-4 col-lg-3 col-xl-2">
+                <a href="<?= $base_url ?>?tipe=<?= $tipe_entitas ?>&id_entitas=<?= $id ?>"
+                    class="btn w-100 <?= $btnClass ?> rounded-3 py-2 fw-semibold text-truncate border-2"
+                    title="<?= htmlspecialchars($nama) ?>">
+                    <?= htmlspecialchars($nama) ?>
+                </a>
+            </div>
+            <?php endwhile; ?>
+        </div>
+        <?php if ($entitas_list_count == 0): ?>
+            <div class="alert alert-warning mt-3 text-center" role="alert">
+                <i class="bi bi-exclamation-triangle-fill"></i> Saat ini tidak ada <?= $nama_entitas_kapital ?> yang tersedia untuk dipinjam.
+            </div>
+        <?php endif; ?>
     </div>
-
-    <hr class="my-4">
-
     <?php if ($entitas_id_selected > 0 && $detail): ?>
 
-        <div class="card border-0 shadow-lg mb-5 overflow-hidden">
-            <div class="row g-0 align-items-stretch">
-                <div class="col-md-5">
-                    <?php if (!empty($detail['gambar'])): ?>
-                        <img src="../../../assets/img/<?= $folder_gambar ?>/<?= htmlspecialchars($detail['gambar']); ?>"
-                            class="img-fluid h-100 w-100 object-fit-cover"
-                            alt="<?= htmlspecialchars($detail[$kolom_nama] ?? ''); ?>">
-                    <?php else: ?>
-                        <img src="../../../assets/img/no-image.jpg"
-                            class="img-fluid h-100 w-100 object-fit-cover"
-                            alt="No Image">
-                    <?php endif; ?>
-                </div>
-                <div class="col-md-7 bg-light">
-                    <div class="card-body py-4 px-5">
-                        <h3 class="card-title fw-bold mb-3 text-dark"><?= htmlspecialchars($detail[$kolom_nama] ?? ''); ?></h3>
-                        <p><i class="bi bi-tag-fill text-primary"></i> <b>Kategori:</b> <?= htmlspecialchars($detail['nama_kategori'] ?? ''); ?></p>
-                        <p><i class="bi bi-geo-alt-fill text-danger"></i> <b>Lokasi:</b> <?= htmlspecialchars($detail['lokasi'] ?? 'N/A'); ?></p>
-                        <p><i class="bi bi-people-fill text-success"></i> <b>Kapasitas:</b> <?= htmlspecialchars($detail['kapasitas'] ?? 'N/A'); ?> orang</p>
-                        <p><i class="bi bi-check-circle-fill text-info"></i> <b>Status:</b> <?= htmlspecialchars($detail['status_entitas'] ?? 'N/A'); ?></p>
+        <hr class="my-5">
 
-                        <p class="fw-semibold mt-4 mb-1"><i class="bi bi-tools text-warning"></i> Fasilitas:</p>
-                        <ul class="mb-0">
-                            <?php if (isset($result_fasilitas) && mysqli_num_rows($result_fasilitas) > 0): ?>
-                                <?php while ($f = mysqli_fetch_assoc($result_fasilitas)): ?>
-                                    <li><?= htmlspecialchars($f['nama_fasilitas']); ?> <?= $f['jumlah'] ? "({$f['jumlah']} unit)" : ''; ?></li>
-                                <?php endwhile; ?>
-                            <?php else: ?>
-                                <li><em>Tidak ada fasilitas terdaftar</em></li>
+        <h3 class="fw-bold fs-4 mb-4 text-dark"><i class="bi bi-info-circle-fill text-info me-2"></i> Detail <?= htmlspecialchars($detail[$kolom_nama] ?? 'Entitas'); ?></h3>
+        
+        <div class="card border-0 shadow-lg mb-5 rounded-4 overflow-hidden">
+            <div class="row g-0 align-items-stretch"> 
+                
+                <div class="col-lg-5 col-md-12 bg-dark d-flex align-items-center justify-content-center p-4">
+                    <?php 
+                        $image_path = (!empty($detail['gambar'])) 
+                            ? '../../../assets/img/' . $folder_gambar . '/' . htmlspecialchars($detail['gambar'])
+                            : '../../../assets/img/no-image.jpg';
+                    ?>
+                    <div class="w-100 p-2" style="max-width: 450px; margin: 0 auto; background: rgba(255, 255, 255, 0.1); border-radius: 10px;"> 
+                        <img src="<?= $image_path; ?>"
+                            class="img-fluid rounded-3 shadow"
+                            alt="<?= htmlspecialchars($detail[$kolom_nama] ?? 'Gambar Entitas'); ?>"
+                            style="width: 100%; height: auto; object-fit: contain; max-height: 500px;">
+                    </div>
+                </div>
+                
+                <div class="col-lg-7 col-md-12 bg-white">
+                    <div class="card-body py-4 px-md-5">
+                        <h4 class="card-title fw-bolder mb-4 text-primary border-bottom pb-2"><?= htmlspecialchars($detail[$kolom_nama] ?? ''); ?></h4>
+                        
+                        <div class="row mb-4">
+                            <div class="col-sm-6 mb-3">
+                                <div class="p-3 bg-light rounded-3 border">
+                                    <span class="d-block fw-light text-muted small">Kategori</span>
+                                    <p class="mb-0 fw-semibold text-dark"><i class="bi bi-tag-fill text-danger me-2"></i> <?= htmlspecialchars($detail['nama_kategori'] ?? 'N/A'); ?></p>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 mb-3">
+                                <div class="p-3 bg-light rounded-3 border">
+                                    <span class="d-block fw-light text-muted small">Lokasi</span>
+                                    <p class="mb-0 fw-semibold text-dark"><i class="bi bi-geo-alt-fill text-warning me-2"></i> <?= htmlspecialchars($detail['lokasi'] ?? 'N/A'); ?></p>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 mb-3">
+                                <div class="p-3 bg-light rounded-3 border">
+                                    <span class="d-block fw-light text-muted small">Kapasitas</span>
+                                    <p class="mb-0 fw-semibold text-dark"><i class="bi bi-people-fill text-success me-2"></i> <?= htmlspecialchars($detail['kapasitas'] ?? 'N/A'); ?> orang</p>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 mb-3">
+                                <div class="p-3 bg-light rounded-3 border">
+                                    <span class="d-block fw-light text-muted small">Status</span>
+                                    <p class="mb-0 fw-semibold text-dark text-capitalize"><i class="bi bi-check-circle-fill text-info me-2"></i> <?= htmlspecialchars($detail['status_entitas'] ?? 'N/A'); ?></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h5 class="fw-bold mt-4 mb-3 border-bottom pb-1 text-secondary"><i class="bi bi-tools me-2"></i> Fasilitas Tersedia</h5>
+                        <ul class="list-unstyled row g-2">
+                            <?php 
+                            $fasilitas_found = false;
+                            if (isset($result_fasilitas) && mysqli_num_rows($result_fasilitas) > 0): 
+                                mysqli_data_seek($result_fasilitas, 0); 
+                                while ($f = mysqli_fetch_assoc($result_fasilitas)): 
+                                    $fasilitas_found = true;
+                            ?>
+                                <li class="col-lg-6 col-md-12">
+                                    <span class="d-flex align-items-center">
+                                        <i class="bi bi-check-circle-fill text-primary me-2"></i> 
+                                        <?= htmlspecialchars($f['nama_fasilitas']); ?> 
+                                        <span class="small text-muted ms-auto"><?= $f['jumlah'] ? "({$f['jumlah']} unit)" : ''; ?></span>
+                                    </span>
+                                </li>
+                            <?php 
+                                endwhile; 
+                            endif;
+                            if (!$fasilitas_found):
+                            ?>
+                                <li class="col-12 text-muted fst-italic">Tidak ada fasilitas terdaftar untuk <?= $detail[$kolom_nama] ?? 'entitas ini'; ?>.</li>
                             <?php endif; ?>
                         </ul>
+
                     </div>
                 </div>
             </div>
         </div>
 
-        <h3 class="fw-bold mb-3 text-primary">📅 Kalender Ketersediaan</h3>
-        <div id="calendar" class="border rounded-4 p-4 bg-white shadow-sm"></div>
+        <h3 class="fw-bold fs-4 mb-4 text-dark"><i class="bi bi-calendar-check-fill text-danger me-2"></i> Pilih Tanggal Peminjaman</h3>
+        <p class="text-muted">Klik pada tanggal yang kosong di kalender untuk mengajukan peminjaman. **Jadwal yang berwarna menandakan tanggal tersebut sudah terisi atau diblokir.**</p>
+        
+        <div id="calendar" class="border rounded-4 p-4 bg-white shadow-lg mb-5"></div>
+        
+        <div class="d-flex flex-wrap gap-4 justify-content-center mt-4 p-3 bg-light rounded-3 shadow-sm">
+            <span class="badge bg-danger"><i class="bi bi-square-fill me-1"></i> Perbaikan/Diblokir</span>
+            <span class="badge bg-warning text-dark"><i class="bi bi-square-fill me-1"></i> Dipakai/Disetujui</span>
+            <span class="badge bg-primary"><i class="bi bi-square-fill me-1"></i> Menunggu Persetujuan</span>
+            <span class="badge bg-success"><i class="bi bi-square-fill me-1"></i> Tersedia (Klik untuk Pinjam)</span>
+        </div>
 
         <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.11/locales/id.global.min.js"></script>
 
         <script>
             document.addEventListener('DOMContentLoaded', function() {
@@ -220,91 +293,99 @@ if ($entitas_id_selected > 0) {
                     eventDisplay: 'block',
                     eventTextColor: '#fff',
                     selectable: true,
+                    navLinks: true, 
+                    editable: false,
+                    dayMaxEvents: true, 
+                    locale: 'id', 
 
                     // Logika ketika user KLIK TANGGAL
                     dateClick: function(info) {
                         const clickedDate = info.dateStr;
-                        const now = new Date(); // Dapatkan waktu dan tanggal saat ini
-                        const todayISO = now.toISOString().slice(0, 10); // Format 'YYYY-MM-DD' hari ini
+                        const now = new Date(); 
+                        const todayISO = now.toISOString().slice(0, 10); 
 
                         // 1. Cek Tanggal Lampau
                         if (clickedDate < todayISO) {
                             Swal.fire({
-                                icon: 'warning',
-                                title: 'Tanggal Lampau',
+                                icon: 'error',
+                                title: 'Tanggal Tidak Valid',
                                 text: 'Tidak dapat meminjam untuk tanggal yang sudah berlalu.',
-                                confirmButtonColor: '#d33'
+                                confirmButtonColor: '#dc3545'
                             });
-                            return; // Hentikan proses jika tanggal lampau
+                            return; 
                         }
 
                         // 2. Cek Konflik: Filter event yang masih AKTIF di tanggal ini
                         const conflictingEvents = eventsData.filter(event => {
-                            // a. Cek apakah tanggal event sama dengan tanggal yang diklik
                             const isSameDay = event.start.startsWith(clickedDate);
-                            
-                            // b. Cek apakah status event adalah yang memblokir
+                            // Status yang memblokir: Perbaikan, Diblokir, Dipakai, Menunggu
                             const isBlocking = (event.status === 'Perbaikan' || event.status === 'Diblokir' || event.status === 'Dipakai' || event.status === 'Menunggu');
                             
-                            // Jika tanggalnya sama dan statusnya memblokir...
                             if (isSameDay && isBlocking) {
-                                // Jika tanggal yang diklik BUKAN hari ini, event dianggap konflik penuh (seluruh hari diblokir)
                                 if (clickedDate !== todayISO) {
-                                    return true;
+                                    return true; 
                                 }
                                 
-                                // Jika tanggal yang diklik ADALAH hari ini, kita harus cek jam
-                                // Kita harus membandingkan waktu selesai event dengan waktu sekarang (now)
+                                // Jika hari ini, cek jam
                                 const eventEnd = new Date(event.end); 
-                                
-                                // Event dianggap konflik HANYA jika waktu selesainya belum berlalu (eventEnd > now)
-                                // Tambahkan sedikit toleransi waktu untuk memastikan event yang baru selesai 1 detik lalu tidak memblokir
                                 const timeToleranceSeconds = 1; 
                                 const eventEndTimeMinusTolerance = new Date(eventEnd.getTime() - (timeToleranceSeconds * 1000));
                                 
                                 if (eventEndTimeMinusTolerance > now) {
-                                    return true; // Waktu selesai event masih di masa depan = Konflik Aktif
+                                    return true; 
                                 }
                                 
-                                // Jika waktu selesai event sudah <= waktu sekarang, artinya event sudah lewat, tidak dianggap konflik aktif.
                                 return false; 
                             }
 
-                            return false; // Bukan di hari yang sama atau status tidak memblokir
+                            return false; 
                         });
 
                         // 3. Tampilkan Notifikasi Konflik atau Lanjut ke Form
                         if (conflictingEvents.length > 0) {
-                            let conflictText = "Tanggal ini sudah memiliki jadwal aktif:<ul>";
+                            let conflictText = "<p class='text-danger fw-bold'>Tanggal ini sudah memiliki jadwal aktif yang memblokir:</p><ul>";
                             conflictingEvents.forEach(event => {
-                                // Ambil jam dari event title (e.g., "DIPAKAI (08:00:00 - 10:00:00)")
                                 const timeMatch = event.title.match(/\((.*?)\)/);
                                 const time = timeMatch ? timeMatch[1] : 'Waktu Tidak Diketahui';
-
-                                conflictText += `<li>**${event.status}** pada pukul ${time}</li>`;
+                                conflictText += `<li><span class='badge bg-dark text-uppercase'>${event.status}</span> pada pukul ${time}</li>`;
                             });
-                            conflictText += "</ul>Silakan cek jam ketersediaan atau pilih tanggal lain.";
+                            conflictText += "</ul><p class='mt-3'>Silakan cek jam ketersediaan yang detail atau pilih tanggal lain.</p>";
 
                             Swal.fire({
                                 icon: 'warning',
-                                title: 'Jadwal Sudah Ada',
+                                title: 'Jadwal Terisi!',
                                 html: conflictText,
-                                confirmButtonColor: '#d33'
+                                confirmButtonColor: '#dc3545'
                             });
                         } else {
                             // Lanjut ke form_peminjaman.php
-                            window.location.href = `form_peminjaman.php?tipe=${tipeEntitas}&id_entitas=${entitasID}&tanggal=${clickedDate}`;
+                            Swal.fire({
+                                icon: 'question',
+                                title: 'Konfirmasi Peminjaman',
+                                text: `Anda akan mengajukan peminjaman untuk tanggal ${clickedDate}. Lanjutkan?`,
+                                showCancelButton: true,
+                                confirmButtonText: 'Ya, Lanjutkan',
+                                cancelButtonText: 'Batal',
+                                confirmButtonColor: '#0d6efd',
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.href = `form_peminjaman.php?tipe=${tipeEntitas}&id_entitas=${entitasID}&tanggal=${clickedDate}`;
+                                }
+                            });
                         }
                     },
 
-                    // Logika ketika user KLIK EVENT (opsional)
                     eventClick: function(info) {
+                        const start = new Date(info.event.start);
+                        const end = new Date(info.event.end);
                         Swal.fire({
                             title: 'Informasi Jadwal',
                             html: `
-                                <b>Status:</b> ${info.event.extendedProps.status}<br>
-                                <b>Waktu:</b> ${info.event.start.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - 
-                                ${info.event.end.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                <table class="table table-sm text-start">
+                                    <tr><th>Status</th><td>: <span class="badge bg-secondary text-uppercase">${info.event.extendedProps.status}</span></td></tr>
+                                    <tr><th>Tanggal</th><td>: ${start.toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'})}</td></tr>
+                                    <tr><th>Waktu</th><td>: ${start.toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'})} - ${end.toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'})}</td></tr>
+                                </table>
                             `,
                             icon: 'info',
                             confirmButtonText: 'Tutup'
@@ -317,8 +398,8 @@ if ($entitas_id_selected > 0) {
         </script>
 
     <?php else: ?>
-        <div class="alert alert-info shadow-sm">
-            Silakan pilih salah satu **<?= $nama_entitas_kapital ?>** di atas untuk melihat detail dan jadwal ketersediaannya.
+        <div class="alert alert-info border-0 p-4 shadow-sm text-center">
+            <i class="bi bi-lightbulb-fill me-2"></i> Silakan pilih salah satu **<?= $nama_entitas_kapital ?>** di atas untuk melihat detail dan jadwal ketersediaannya.
         </div>
     <?php endif; ?>
 </div>

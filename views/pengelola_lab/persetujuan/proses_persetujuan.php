@@ -7,7 +7,7 @@ require '../../../settings/koneksi.php';
 $db = new Database();
 $koneksi = $db->conn;
 
-function redirect_with_alert($icon, $title, $text, $location = 'persetujuan_lab.php')
+function redirect_with_alert($icon, $title, $text, $location = 'persetujuan.php')
 {
     $_SESSION['alert'] = [
         'icon' => $icon,

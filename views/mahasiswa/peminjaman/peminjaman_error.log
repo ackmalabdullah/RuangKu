@@ -16,3 +16,21 @@
 [03-Dec-2025 09:28:35 Europe/Berlin] Berhasil insert peminjaman ID: 33
 [03-Dec-2025 09:28:35 Europe/Berlin] Berhasil insert jadwal_ruangan
 [03-Dec-2025 09:28:35 Europe/Berlin] TRANSAKSI RUANGAN BERHASIL
+[04-Dec-2025 20:11:09 Europe/Berlin] ==========================================
+[04-Dec-2025 20:11:09 Europe/Berlin] PROSES PEMINJAMAN LAB - 2025-12-04 20:11:09
+[04-Dec-2025 20:11:09 Europe/Berlin]   POST[tipe_entitas] = laboratorium
+[04-Dec-2025 20:11:09 Europe/Berlin]   POST[entitas_id] = 1
+[04-Dec-2025 20:11:09 Europe/Berlin]   POST[tanggal_pinjam] = 2025-12-06
+[04-Dec-2025 20:11:09 Europe/Berlin]   POST[jam_mulai] = 06:10
+[04-Dec-2025 20:11:09 Europe/Berlin]   POST[jam_selesai] = 09:10
+[04-Dec-2025 20:11:09 Europe/Berlin]   POST[keperluan] = sidang skripsi
+[04-Dec-2025 20:11:09 Europe/Berlin]   POST[jumlah_peserta] = 12
+[04-Dec-2025 20:11:09 Europe/Berlin] Session mahasiswa_id: 1
+[04-Dec-2025 20:11:09 Europe/Berlin] ==========================================
+[04-Dec-2025 20:11:09 Europe/Berlin] Cek lab ID: 1
+[04-Dec-2025 20:11:09 Europe/Berlin] Lab ditemukan: RSI
+[04-Dec-2025 20:11:09 Europe/Berlin] Cek konflik jadwal lab...
+[04-Dec-2025 20:11:09 Europe/Berlin] Tidak ada konflik
+[04-Dec-2025 20:11:09 Europe/Berlin] Berhasil insert peminjaman ID: 34
+[04-Dec-2025 20:11:09 Europe/Berlin] Berhasil insert jadwal_lab
+[04-Dec-2025 20:11:09 Europe/Berlin] TRANSAKSI LAB BERHASIL

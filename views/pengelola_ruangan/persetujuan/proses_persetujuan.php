@@ -1,9 +1,5 @@
 <?php
-// FILE: views/pengelola_ruangan/persetujuan/proses_persetujuan.php
 
-// =============================================
-// 1️⃣ INISIALISASI DASAR DAN CEK SESSION
-// =============================================
 session_start();
 
 // Ganti path sesuai struktur proyek Anda
@@ -12,7 +8,6 @@ require '../../../settings/koneksi.php';
 $db = new Database();
 $koneksi = $db->conn;
 
-// Fungsi redirect (Jika belum ada di utilities.php, tambahkan ini di proses_persetujuan.php)
 if (!function_exists('redirect_with_alert')) {
     function redirect_with_alert($icon, $title, $text, $location = 'persetujuan.php')
     {
@@ -31,9 +26,6 @@ if (!isset($_SESSION['id_user']) || $_SESSION['role'] !== 'pengelola_ruangan') {
     redirect_with_alert('error', 'Akses Ditolak', 'Silakan login sebagai pengelola ruangan.');
 }
 
-// =============================================
-// 2️⃣ VALIDASI REQUEST DAN SANITASI INPUT
-// =============================================
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     redirect_with_alert('error', 'Akses Ditolak', 'Halaman ini hanya dapat diakses melalui pengajuan formulir.');
 }
@@ -64,12 +56,6 @@ if ($stmt_name) {
     mysqli_stmt_close($stmt_name);
 }
 
-// =============================================
-// 3️⃣ AMBIL DATA PEMINJAMAN SEBELUM PROSES & TENTUKAN ENTITAS
-// >>> KOREKSI UTAMA: Filter harus memastikan status_jurusan = 'disetujui' jika itu ruangan <<<
-// =============================================
-
-// Langkah 1: Ambil data peminjaman untuk menentukan jenis entitas dan status jurusannya
 $sql_get_data = "
     SELECT ruangan_id, lab_id, status, status_jurusan 
     FROM peminjaman 
@@ -91,47 +77,28 @@ $lab_id = $peminjaman_data['lab_id'];
 $status_jurusan = $peminjaman_data['status_jurusan'];
 $is_ruangan = $ruangan_id !== null;
 
-// Langkah 2: Lakukan Verifikasi Status Jurusan (Hanya untuk Peminjaman Ruangan)
 if ($is_ruangan && $status_jurusan !== 'disetujui') {
      $warning_text = 'Peminjaman ini belum disetujui oleh Jurusan. Pengelola ruangan tidak dapat memproses permintaan ini.';
      redirect_with_alert('warning', 'Akses Ditolak', $warning_text);
 }
 
-// Tentukan tabel dan kolom yang akan digunakan
 $tabel_jadwal = $is_ruangan ? 'jadwal_ruangan' : 'jadwal_lab';
 $kolom_id_fk  = $is_ruangan ? 'ruangan_id' : 'lab_id';
 
-
-// =============================================
-// 3.1. ⚠️ CEK KONFLIK JADWAL AKTIF (Hanya Jika Aksi = 'disetujui')
-// ... (Kode Cek Konflik tetap sama)
 if ($action === 'disetujui') {
-    // KODE CEK KONFLIK (Anda harus memastikan ini sudah ada di file asli Anda)
-    // ...
-    // Jika bentrok, panggil:
-    // redirect_with_alert('warning', 'Jadwal Bentrok', "Waktu bentrok...");
 }
 
-
-// =============================================
-// 4️⃣ PENENTUAN STATUS BARU
-// =============================================
 $new_peminjaman_status = $action; // 'disetujui' atau 'ditolak'
 $new_jadwal_status     = ($action === 'disetujui') ? 'Dipakai' : 'Ditolak';
 
-$entity_name = $is_ruangan ? 'Ruangan' : 'Lab'; // Asumsi entitas lab sudah diatur
+$entity_name = $is_ruangan ? 'Ruangan' : 'Lab'; 
 $log_message = ($action === 'disetujui') 
     ? "Peminjaman **{$entity_name}** telah **DISETUJUI FINAL** oleh {$approved_by_name}."
     : "Peminjaman **{$entity_name}** telah **DITOLAK FINAL** oleh {$approved_by_name}.";
 
-
-// =============================================
-// 5️⃣ PROSES UPDATE MENGGUNAKAN TRANSAKSI
-// =============================================
 mysqli_begin_transaction($koneksi);
 
 try {
-    // 5.1. UPDATE STATUS PEMINJAMAN
     $sql_update_peminjaman = "
         UPDATE peminjaman
         SET status = ?, approved_by = ?, updated_at = ?
@@ -182,20 +149,15 @@ try {
     mysqli_stmt_execute($stmt_update_jadwal);
     mysqli_stmt_close($stmt_update_jadwal);
 
-    // 5.3. COMMIT TRANSAKSI
     mysqli_commit($koneksi);
     
-    // 5.4. PESAN SUKSES
     redirect_with_alert('success', 'Aksi Berhasil', $log_message);
 
 } catch (Exception $e) {
-    // 5.5. ROLLBACK JIKA GAGAL
     mysqli_rollback($koneksi);
     
-    // Log error secara internal untuk debugging
     error_log("Gagal transaksi persetujuan: " . $e->getMessage()); 
     
-    // Tampilkan pesan error umum kepada pengguna
     redirect_with_alert(
         'error',
         'Aksi Gagal',
