@@ -41,7 +41,7 @@ if (mysqli_num_rows($query) == 0) {
 }
 
 $user_nama = $_SESSION['nama_user'] ?? 'Admin';
-$user_email = $_SESSION['email'] ?? '-';
+$user_email = $_SESSION['email'] ?? '';
 
 ?>
 <!DOCTYPE html>
