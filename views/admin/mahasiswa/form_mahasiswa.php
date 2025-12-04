@@ -57,6 +57,54 @@ $prodi = $koneksi->query("SELECT id_prodi, nama_prodi FROM prodi");
     <div class="col-xxl">
 
 
+<!-- FILTER DATA MAHASISWA -->
+<div class="card mb-4">
+  <div class="card-header">
+    <strong>Filter Data Mahasiswa</strong>
+  </div>
+
+  <div class="card-body">
+    <form action="form_mahasiswa.php" method="GET" class="row g-3">
+
+      <!-- FILTER PRODI -->
+      <div class="col-md-4">
+        <label class="form-label">Program Studi</label>
+        <select name="filter_prodi" class="form-select">
+          <option value="">Semua Prodi</option>
+          <?php 
+            $prodi_filter = $koneksi->query("SELECT * FROM prodi");
+            while ($pf = $prodi_filter->fetch_assoc()):
+          ?>
+            <option value="<?= $pf['id_prodi']; ?>"
+              <?= isset($_GET['filter_prodi']) && $_GET['filter_prodi'] == $pf['id_prodi'] ? 'selected' : ''; ?>>
+              <?= $pf['nama_prodi']; ?>
+            </option>
+          <?php endwhile; ?>
+        </select>
+      </div>
+
+      <!-- FILTER ANGKATAN -->
+      <div class="col-md-4">
+        <label class="form-label">Angkatan</label>
+        <input type="number" 
+               name="filter_angkatan" 
+               class="form-control"
+               placeholder="Contoh: 2022"
+               value="<?= isset($_GET['filter_angkatan']) ? $_GET['filter_angkatan'] : ''; ?>">
+      </div>
+
+      <!-- TOMBBOL -->
+      <div class="col-md-4 d-flex align-items-end">
+        <button class="btn btn-primary w-100" type="submit">
+          <i class="bx bx-filter-alt me-1"></i> Filter
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+
       <div class="card mb-4">
         <div class="card-header d-flex align-items-center justify-content-between">
           <h5 class="mb-0"><?= $judul_halaman; ?></h5>
