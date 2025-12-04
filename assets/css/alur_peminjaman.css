@@ -1,0 +1,84 @@
+/* --- Work Process Section --- */
+.work-process-section {
+    position: relative;
+    background-image: url('../img/bgalur.png'); /* pastikan path sesuai file CSS */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 80px 0;
+    color: #333;
+    text-align: center;
+}
+
+/* Judul dan deskripsi */
+.work-process-section .section-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    color: #fff;
+}
+
+.work-process-section .section-header p {
+    font-size: 1.1rem;
+    color: #fff;
+    margin-bottom: 50px;
+}
+
+/* Kotak alur */
+.process-boxes {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 20px;
+    flex-wrap: nowrap; /* tetap satu baris */
+    overflow-x: auto; /* scroll horizontal jika layar kecil */
+    padding: 20px 0;
+}
+
+.process-boxes::-webkit-scrollbar {
+    height: 6px;
+}
+.process-boxes::-webkit-scrollbar-thumb {
+    background-color: rgba(0,0,0,0.2);
+    border-radius: 3px;
+}
+
+/* Kotak individual */
+.process-box {
+    background: #fff; /* putih */
+    padding: 20px;
+    border-radius: 12px;
+    width: 180px;       /* lebar tetap untuk semua kotak */
+    min-height: 260px;  /* tinggi tetap supaya semua kotak sama */
+    text-align: center;
+    flex-shrink: 0;     /* supaya tidak mengecil di flex */
+    color: #333;        /* teks lebih jelas */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* bayangan tipis */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Hover effect */
+.process-box:hover {
+    transform: translateY(-10px); /* naik sedikit */
+    box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+}
+
+
+/* Gambar di dalam kotak */
+.process-box img {
+    width: 80px;
+    margin-bottom: 15px;
+}
+
+/* Judul dan teks */
+.process-box strong {
+    display: block;
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.process-box span {
+    font-size: 0.9rem;
+    color: #555;
+    line-height: 1.4;
+}

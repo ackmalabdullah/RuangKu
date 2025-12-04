@@ -7,9 +7,6 @@
 :root {
     --white-color: #FFFFFF;
     --hover-color: #e0e0e0; /* Warna saat link di-hover */
-    --primary-text-color: #1e1e1e; /* Warna teks utama (hitam) */
-    --login-button-bg: #589bff; /* Warna latar belakang tombol login */
-    --login-button-hover: #3a7be0; /* Warna hover tombol login */
 }
 
 /* Mengatur font dasar dari Google Fonts yang sudah Anda impor */
@@ -17,10 +14,6 @@ body {
     font-family: 'Poppins', sans-serif;
     margin: 0;
     padding: 0;
-    /* Tambahkan padding-top agar header floating tidak menutupi konten */
-    padding-top: 100px;
-    /* Hanya untuk demo, agar ada background di bawah header */
-    background-color: #f4f4f4;
 }
 
 /* Styling untuk container agar konten tidak terlalu lebar */
@@ -28,123 +21,103 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
-    /* Gunakan Flexbox untuk penempatan item dalam header */
-    display: flex;
-    justify-content: space-between; /* Menyebar item (Logo, Nav, Login) */
-    align-items: center; /* Menyelaraskan vertikal di tengah */
-    height: 100%; /* Penting untuk Flexbox */
 }
 
-/* --- Styling Header Utama (Floating & Oval) --- */
-.header-wrapper {
-    /* Container untuk header yang akan di-floating dan memiliki bentuk oval */
-    position: fixed; /* Membuat header menjadi floating */
-    top: 20px; /* Jarak dari atas */
-    left: 50%; /* Pindahkan 50% dari kiri */
-    transform: translateX(-50%); /* Pindahkan kembali 50% lebarnya (untuk centering) */
-    width: 90%; /* Lebar header yang diinginkan */
-    max-width: 1200px; /* Batasi lebar maksimal */
-    z-index: 1000;
-}
-
+/* --- Styling Header Utama --- */
 .header {
-    /* Header itu sendiri */
-    background: var(--white-color); /* Background Putih */
-    border-radius: 50px; /* Membuat bentuk oval/pill */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Efek floating/bayangan */
-    padding: 10px 30px; /* Padding di dalam header */
-    transition: all 0.3s ease;
-    height: 80px; /* Tinggi tetap untuk header */
+    position: absolute; 
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    padding: 20px 0;
+    transition: background-color 0.3s ease;
+    background: transparent;
 }
-
-/* Hapus styling lama yang konflik */
-.header-area {
-    /* Menggantikan .header-area dengan .header-wrapper di HTML */
-}
+    
 
 /* Logo mengikuti ukuran asli gambar */
 .header-area .main-nav .logo img,
 .logo-img {
     height: auto;
     width: auto;
-    max-height: 50px; /* Lebih kecil agar pas dengan oval */
+    max-height: 55px;     /* ukuran ideal agar tidak terlalu tinggi */
     transition: all 0.3s ease;
     display: block;
 }
 
-/* --- Styling Menu Navigasi (Flexbox) --- */
-
-/* Gunakan Flexbox untuk mengatur posisi Logo, Nav, dan Login */
-.header-area .main-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    /* Atur agar main-nav mengisi container */
+.header-area.header-sticky .logo img {
+    max-height: 45px;
 }
 
-/* Reset float lama */
-.header-area .main-nav .logo,
-.header-area .main-nav .nav {
-    float: none;
-    margin: 0;
-    padding: 0;
+
+/* --- Styling Menu Navigasi --- */
+.header-area .main-nav .logo {
+  float: left;
+  margin-top: 37px;
+  margin-left: 30px;
 }
 
 .header-area .main-nav .nav {
-    /* Container untuk menu navigasi */
-    list-style: none;
-    display: flex; /* Menu horizontal */
-    align-items: center;
-    flex-grow: 1; /* Biarkan Nav mengambil sisa ruang */
-    justify-content: center; /* Pusatkan link menu */
-    margin: 0 50px; /* Memberi jarak dari logo dan login */
+  float: right;
+  margin-top: 27px;
+  margin-right: 30px;
+  position: relative;
+  z-index: 999;
 }
 
 .header-area .main-nav .nav li {
-    padding: 0 15px; /* Jarak antar item menu */
+  padding-left: 20px;
+  padding-right: 20px;
 }
 
 .header-area .main-nav .nav li a {
-    display: block;
-    font-weight: 500;
-    font-size: 14px;
-    color: var(--primary-text-color); /* Warna teks hitam */
-    transition: .3s;
-    height: 40px;
-    line-height: 40px;
-    letter-spacing: 0.5px;
-    text-transform: capitalize;
+  display: block;
+  font-weight: 500;
+  font-size: 13px;
+  color: #fff;
+  transition: .3s;
+  height: 40px;
+  line-height: 40px;
+  letter-spacing: 1px;
 }
 
 .header-area .main-nav .nav li a:hover {
-    color: var(--login-button-bg); /* Warna hover biru */
+  color: #589bff;
 }
 .header-area .main-nav .menu-trigger {
-    display: none;
+  display: none;
 }
 
-/* --- Styling Tombol Login (Paling Kanan) --- */
-.nav-login-btn {
-    /* Tombol/Link Login */
-    padding: 8px 20px;
-    background-color: var(--login-button-bg);
-    color: var(--white-color) !important; /* Penting untuk menimpa warna link */
-    border-radius: 30px;
-    font-weight: 600 !important;
-    font-size: 13px !important;
-    transition: background-color 0.3s ease;
-    text-decoration: none;
-    white-space: nowrap; /* Pastikan tidak pecah baris */
+.header-area.header-sticky {
+  min-height: 80px;
 }
 
-.nav-login-btn:hover {
-    background-color: var(--login-button-hover);
-    color: var(--white-color) !important;
+.header-area.header-sticky .nav li a {
+  color: #1e1e1e;
 }
 
-/* Hapus styling avatar lama jika tidak digunakan */
+.header .login-btn {
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.7) !important;
+    background-color: transparent !important;
+    text-decoration: none !important;
+    border-radius: 8px;
+    padding: 8px 16px;
+    transition: all 0.3s ease;
+}
+
+.header .login-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+}
+
+/* --- Styling Avatar --- */
 .nav-avatar {
-    display: none; /* Sembunyikan jika diganti dengan tombol Login */
+    width: 45px;
+    height: 45px;
+    background-color: #d1d1d1; /* Warna placeholder abu-abu */
+    border-radius: 50%; /* Membuatnya menjadi lingkaran sempurna */
+    cursor: pointer; /* Mengubah kursor menjadi tangan saat di-hover */
 }
-

@@ -1,7 +1,7 @@
 /* --- Global Styles & Variables --- */
 :root {
-    --primary-color: #3B5998; /* Warna biru tua dari CTA */
-    --highlight-color: #4D9DE0; /* Warna biru terang pada kartu */
+    --primary-color: #3B5998;
+    --highlight-color: #4d9ee0;
     --dark-grey: #333333;
     --light-grey: #F4F7F6;
     --text-color: #555;
@@ -75,46 +75,42 @@ body {
 }
 
 /* --- Hero Section (Dengan Overlay Profesional) --- */
-
 .hero {
-    position: relative; /* WAJIB ADA untuk menampung pseudo-element */
-    height: 70vh; /* Sesuaikan tinggi sesuai kebutuhan */
+    position: relative;
+    /* KEMBALI KE NILAI AWAL YANG STABIL */
+    height: 70vh;
     min-height: 600px;
-    background-image: url('../img/gedungti.jpg'); /* Ganti dengan path gambar Anda yang benar */
-    background-size: cover;
+    background-image: url('../img/gedungti.png');
+    background-size: cover; /* STABIL */
     background-position: center;
     
-    /* Atur padding agar konten di dalamnya tidak mentok ke atas */
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
     text-align: center;
-    padding-bottom: 80px;
+    
+    /* Nilai yang sudah dikonfirmasi untuk posisi teks */
+    padding-top: 200px; 
+    padding-bottom: 80px; 
 }
 
 /* INI BAGIAN PALING PENTINGNYA */
 .hero::before {
-    content: ''; /* Pseudo-element wajib punya content */
-    position: absolute; /* Melayang di atas parent-nya (.hero) */
+    content: '';
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 1; /* Berada di antara background gambar dan konten teks */
+    z-index: 1;
     
-    /* Lapisan gradient yang membuat efek gelap di atas gambar */
     background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.2) 40%, transparent 80%);
 }
 
 /* Pastikan konten hero berada di atas lapisan overlay */
 .hero-content {
     position: relative;
-    z-index: 2; /* Harus lebih tinggi dari z-index ::before */
-    color: white;
-}
-
-.hero-content {
+    z-index: 2; 
     color: var(--white-color);
 }
 
@@ -128,158 +124,225 @@ body {
     line-height: 1.3;
 }
 
-.booking-form-container {
-    position: absolute;
-    bottom: -60px; /* Setengah tinggi form */
-    width: 80%;
-    max-width: 900px;
-    background-color: var(--white-color);
-    border-radius: 15px;
-    padding: 25px;
-    box-shadow: var(--box-shadow);
+/* --- FEATURES BOX SECTION (Untuk Kotak Fitur yang Overlap) --- */
+.features-box-section {
+    position: relative;
+    z-index: 10;
+    margin-top: -180px; 
+    
+    padding-bottom: 20px;
 }
 
-.booking-form {
+.features-grid {
     display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
+    justify-content: center;
     gap: 20px;
 }
 
-.form-group {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-.form-group label {
-    font-weight: 600;
-    margin-bottom: 8px;
-    font-size: 0.9rem;
-}
-
-.form-group input, .form-group select {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-family: 'Poppins', sans-serif;
-}
-
-.btn {
-    padding: 12px 25px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
+.feature-item {
+    background: var(--white-color);
+    color: var(--dark-grey);
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: var(--box-shadow);
+    
+    width: 180px; 
+    min-height: 260px;
+    flex-shrink: 0;
+    
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     cursor: pointer;
-    border: none;
-    transition: all 0.3s ease;
 }
 
-.btn-check {
-    background-color: var(--primary-color);
-    color: var(--white-color);
+/* Efek Zoom Out/Membesar saat di-hover atau aktif (dipencet) */
+.feature-item:hover,
+.feature-item:active {
+    transform: scale(1.05) translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
-.btn-check:hover {
-    background-color: var(--secondary-color);
-}
-
-
-/* --- Ruangan Favorit Section --- */
-.favorite-rooms {
-    padding: 150px 0 60px; /* Padding top untuk memberi ruang form */
+/* =================================================== */
+/* --- START RUANGAN DAN LAB SECTION BARU --- */
+/* =================================================== */
+.room-list-section {
+    background-color: #f4f4f4;
+    padding: 60px 0;
     text-align: center;
 }
 
-.favorite-rooms h2 {
+.room-list-section .section-title {
     font-size: 2rem;
     margin-bottom: 40px;
     color: var(--dark-grey);
 }
 
-.card-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 30px;
+/* --- Kategori/Tombol Atas --- */
+.room-categories {
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+    margin-bottom: 40px;
 }
 
-.card {
-    background: var(--white-color);
+.category-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 30px;
     border-radius: 15px;
+    border: 2px solid var(--light-grey);
+    cursor: pointer;
+    transition: all 0.3s;
     box-shadow: var(--box-shadow);
-    text-align: left;
-    overflow: hidden;
+    background-color: var(--light-grey);
 }
 
-.card-highlighted {
-    border: 3px solid var(--highlight-color);
+.category-item:hover {
+    border-color: var(--highlight-color);
+    background-color: var(--white-color);
 }
 
-.card-image {
-    height: 180px;
-    background-color: #e0e0e0; /* Placeholder for image */
+.category-item.active {
+    border-color: var(--primary-color);
+    background-color: var(--white-color);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
 }
 
-.card-body {
-    padding: 25px;
+.category-item img.category-icon {
+    width: 50px;
+    height: 50px;
 }
 
-.card-body h3 {
-    margin-bottom: 15px;
+.category-info h3 {
+    margin: 0;
+    font-size: 1.4rem;
     color: var(--dark-grey);
 }
 
-.card-body p {
-    margin-bottom: 5px;
-    line-height: 1.6;
-}
-
-.btn-details {
-    display: inline-block;
-    margin-top: 20px;
-    background-color: var(--light-grey);
+.category-info p {
+    margin: 0;
+    font-size: 0.9rem;
     color: var(--text-color);
-    border: 1px solid #ddd;
 }
 
-.btn-details:hover {
-    background-color: #ddd;
+/* --- Area Konten Daftar Ruangan/Lab --- */
+.content-display {
+    min-height: 400px;
+    position: relative; /* Penting untuk positioning anak */
 }
 
-/* --- CTA Section --- */
-.cta {
-    padding: 40px 0;
+/* Semua konten (default, ruangan, lab) disembunyikan dulu */
+.room-content {
+    position: absolute; /* Agar tidak mengganggu layout saat tidak aktif */
+    width: 100%;
+    top: 0;
+    left: 0;
+
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
-.cta-container {
-    background-color: var(--primary-color);
-    color: var(--white-color);
+/* Konten yang aktif ditampilkan */
+.room-content.active {
+    opacity: 1;
+    visibility: visible;
+    position: static; /* Supaya isi turun normal */
+}
+
+/* --- Grid dan Card Ruangan/Lab (Mirip gambar contoh) --- */
+.card-grid {
+    display: grid;
+    /* Membuat grid responsif: minimal 300px per kolom */
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    text-align: left;
+}
+
+.room-card {
+    background: var(--white-color);
     border-radius: 15px;
-    padding: 40px;
+    box-shadow: var(--box-shadow);
+    overflow: hidden;
+    transition: transform 0.3s;
+    border: 1px solid #eee;
+}
+
+.room-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+.card-image-placeholder {
+    height: 180px;
+    overflow: hidden; 
+    border-radius: 15px 15px 0 0; 
+    background-color: #f0f0f0;
+    /* Jika menggunakan tag <img> di dalam, hilangkan background color */
+}
+
+/* Styling untuk gambar di dalam card */
+.card-image-placeholder img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+    display: block;
+}
+
+.room-card .card-body {
+    padding: 20px;
+}
+
+.room-card .card-body h3 {
+    margin-bottom: 10px;
+    color: var(--primary-color);
+    font-size: 1.25rem;
+}
+
+.room-card .card-body p {
+    margin-bottom: 5px;
+    font-size: 0.95rem;
+    color: var(--text-color);
     display: flex;
-    justify-content: space-between;
     align-items: center;
 }
 
-.cta-text p {
-    font-size: 1.2rem;
+.room-card .card-body i {
+    width: 20px; 
+    color: var(--highlight-color);
+    margin-right: 5px;
 }
 
-.cta-text h2 {
-    font-size: 2.5rem;
-    margin-top: 5px;
+
+/* --- Alur Peminjaman --- */
+.work-process-section {
+    background-image: url('../img/bgalur.png'); 
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 80px 0;
+    text-align: center;
+    color: #fff;
 }
 
-.btn-contact {
-    background-color: var(--white-color);
-    color: var(--primary-color);
-    font-size: 1rem;
-    padding: 15px 30px;
+.booking-form .btn-check {
+    background-color: #3B5998; 
+    color: #fff;
+    border-radius: 25px;
+    padding: 12px 30px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s;
 }
 
-.btn-contact:hover {
-    background-color: var(--light-grey);
+    .booking-form .btn-check:focus,
+.booking-form .btn-check:active {
+    background-color: #4d9de0; /* atau warna hover */
+    color: #fff;
+    outline: none; /* hilangkan garis biru default browser */
 }
 
 
@@ -304,4 +367,20 @@ body {
 
 .scroll-to-top:hover {
     transform: translateY(-5px);
+}
+
+/* --- Styling untuk Peta Full-Width di Atas Footer --- */
+.map-embed-container {
+    width: 100%;
+    height: 150px;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+}
+
+.map-embed-container iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
 }
