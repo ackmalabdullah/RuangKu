@@ -1,6 +1,6 @@
 <?php
 // Role yang diperlukan adalah 'pengelola_ruangan' (dibiarkan sesuai file asli)
-$required_role = 'pengelola_lab';
+$required_role = 'jurusan';
 
 // Memuat komponen layout (Pastikan file-file ini ada di path yang benar)
 require '../../../partials/mahasiswa/header.php';
