@@ -24,6 +24,11 @@ $total_lab = ($result_lab) ? $result_lab->num_rows : 0;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RuangKU JTI - Booking Ruangan</title>
     <link rel="stylesheet" href="../assets/css/home.css">
+    <link rel="stylesheet" href="../assets/css/alur_peminjaman.css">
+    <link rel="stylesheet" href="../assets/css/ulasan.css">
+    <link rel="stylesheet" href="../assets/css/footer.css">
+    <link rel="stylesheet" href="../assets/css/header_landing.css"> 
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
