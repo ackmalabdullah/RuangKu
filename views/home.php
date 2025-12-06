@@ -43,37 +43,37 @@ $total_lab = ($result_lab) ? $result_lab->num_rows : 0;
         </section>
 
         <!-- ===== FITUR ===== -->
-        <section class="features-box-section">
-            <div class="container">
-                <div class="features-grid">
+       <section class="features-box-section">
+    <div class="container">
+        <div class="features-grid">
 
-                    <div class="feature-item">
-                        <i class="fas fa-calendar-alt"></i>
-                        <h3>Jadwal Real-time</h3>
-                        <p>Lihat status ruangan dan lab terkini tanpa perlu konfirmasi.</p>
-                    </div>
-
-                    <div class="feature-item">
-                        <i class="fas fa-bolt"></i>
-                        <h3>Peminjaman Cepat</h3>
-                        <p>Proses booking ruangan hanya dalam hitungan menit.</p>
-                    </div>
-
-                    <div class="feature-item">
-                        <i class="fas fa-bell"></i>
-                        <h3>Notifikasi Otomatis</h3>
-                        <p>Dapatkan pemberitahuan persetujuan langsung via email/app.</p>
-                    </div>
-
-                    <div class="feature-item">
-                        <i class="fas fa-chart-line"></i>
-                        <h3>Laporan Riwayat</h3>
-                        <p>Akses riwayat peminjaman Anda dengan mudah dan terstruktur.</p>
-                    </div>
-
-                </div>
+            <div class="feature-item">
+                <i class="fas fa-calendar-alt"></i>
+                <h3>Jadwal Real-time</h3>
+                <p>Lihat status ketersediaan ruangan dan lab secara langsung.</p>
             </div>
-        </section>
+
+            <div class="feature-item">
+                <i class="fas fa-bolt"></i>
+                <h3>Peminjaman Cepat</h3>
+                <p>Ajukan peminjaman ruangan hanya dalam beberapa klik.</p>
+            </div>
+
+            <div class="feature-item">
+                <i class="fas fa-info-circle"></i>
+                <h3>Detail Informasi Ruangan</h3>
+                <p>Setiap ruangan dilengkapi detail informasi.</p>
+            </div>
+
+            <div class="feature-item">
+                <i class="fas fa-chart-line"></i>
+                <h3>Dashboard Riwayat</h3>
+                <p>Pantau status pengajuan dan riwayat peminjaman Anda dengan mudah.</p>
+            </div>
+
+        </div>
+    </div>
+</section>
 
         <!-- ===== DAFTAR RUANGAN / LAB ===== -->
         <section class="room-list-section" id="daftar-ruangan">
@@ -195,42 +195,41 @@ $total_lab = ($result_lab) ? $result_lab->num_rows : 0;
 
                     <div class="process-box">
                         <img src="../assets/img/work-process-item.png" alt="Langkah 5">
-                        <strong>Selesai & Feedback</strong>
-                        <span>Memberikan penilaian untuk layanan.</span>
+                        <strong>Selesai</strong>
+                        <span>Peminjaman dinyatakan selesai sesuai jadwal.</span>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- ===== CONTACT ===== -->
-        <section class="contact-section" id="contact-us">
-            <div class="contact-container">
-                <h2 class="contact-title">Contact Us</h2>
-                <p class="contact-tagline">Ada Pertanyaan? Hubungi Kami Sekarang</p>
+        <section class="ulasan-section" id="ulasan">
+    <h2 class="contact-title">Kritik & Saran</h2>
+    <p class="contact-tagline">Silakan sampaikan pendapat Anda agar layanan kami semakin baik</p>
 
-                <form class="contact-form" onsubmit="kirimWA(); return false;">
-                    <div class="input-group">
-                        <label for="nama">Nama Lengkap</label>
-                        <input type="text" id="nama" placeholder="Nama Lengkap" required>
-                    </div>
-
-                    <div class="input-group">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" placeholder="Email" required>
-                    </div>
-
-                    <div class="input-group">
-                        <label for="pesan">Pesan</label>
-                        <textarea id="pesan" placeholder="Pesan Anda" required></textarea>
-                    </div>
-
-                    <div class="form-button">
-                        <button type="submit" class="btn btn-check">Kirim Pesan</button>
-                    </div>
-                </form>
+    <div class="contact-container">
+        <form class="contact-form">
+            
+            <div class="input-group">
+                <label for="nama">Nama Anda</label>
+                <input type="text" id="nama" placeholder="Masukkan nama Anda">
             </div>
-        </section>
-    </main>
+
+            <div class="input-group">
+                <label for="pesan">Kritik / Saran</label>
+                <textarea id="pesan" placeholder="Tulis kritik atau saran Anda di sini..."></textarea>
+            </div>
+
+            <div class="form-button">
+                <button type="button" class="btn-check" onclick="kirimWA()">
+                    Kirim ke WhatsApp
+                </button>
+            </div>
+
+        </form>
+    </div>
+</section>
+
 
     <!-- JS -->
     <script>
@@ -251,24 +250,8 @@ $total_lab = ($result_lab) ? $result_lab->num_rows : 0;
         });
     });
 
-    // ==== WHATSAPP SEND ====
-    function kirimWA() {
-        let nama = document.getElementById("nama").value.trim();
-        let email = document.getElementById("email").value.trim();
-        let pesan = document.getElementById("pesan").value.trim();
-
-        if (!nama || !email || !pesan) {
-            alert("Harap isi semua field!");
-            return;
-        }
-
-        let noWa = "6281233884767";
-        let text = `Halo Admin RuangKu. Nama: ${nama}. Email: ${email}. Pesan: ${pesan}`;
-        let url = "https://api.whatsapp.com/send?phone=" + noWa + "&text=" + encodeURIComponent(text);
-
-        window.open(url, "_blank");
-    }
     </script>
+    <script src="../assets/assets_dashboard/js/contact.js"></script>    
 
 <div class="map-embed-container">
     <iframe

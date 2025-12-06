@@ -9,7 +9,7 @@ $base_path = "/APKPINRULAB";
     <title>RuangKu JTI - Booking Ruangan</title>
 
     <link rel="stylesheet" href="../assets/css/footer.css">
-<link rel="stylesheet" href="../assets/css/contact_us.css">
+<link rel="stylesheet" href="../assets/css/ulasan.css">
 <link rel="stylesheet" href="../assets/css/alur_peminjaman.css">
 <link rel="stylesheet" href="../assets/css/header_landing.css"> <!-- load terakhir -->
 <script src="../assets/js/contact.js"></script>
@@ -35,7 +35,7 @@ $base_path = "/APKPINRULAB";
                 <li class="nav-item"><a href="#home" class="nav-link">Home</a></li>
                 <li class="nav-item"><a href="#daftar-ruangan" class="nav-link">Daftar Ruangan</a></li>
                 <li class="nav-item"><a href="#alur-peminjaman" class="nav-link">Alur Peminjaman</a></li>
-                <li class="nav-item"><a href="#contact-us" class="nav-link">Kontak</a></li>
+                <li class="nav-item"><a href="#ulasan" class="nav-link">Ulasan</a></li>
             </ul>
             <a href="../views/auth/login_mahasiswa.php" class="login-btn">Login</a>
         </nav>

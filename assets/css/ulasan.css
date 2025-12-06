@@ -1,27 +1,31 @@
 /* ===========================
-   CONTACT SECTION FINAL
+    CONTACT SECTION FINAL
 =========================== */
-#contact-us {
-    padding-top: 100px;   /* jarak dari section sebelumnya */
-    padding-bottom: 160px; /* jarak bawah */
+#ulasan {
+    padding-top: 100px; 
+    /* Mengurangi jarak bawah dari 160px ke 80px/100px agar tidak terlalu jauh dari Maps */
+    padding-bottom: 100px;
     background-color: #F0F3FA;
     position: relative;
     z-index: 1;
 }
 
-#contact-us .contact-title {
-    font-size: 32px;
+/* --- PERBAIKAN: Mengganti .ulasan-title menjadi .contact-title --- */
+#ulasan .contact-title { 
+    font-size: 2rem; /* Menggunakan rem untuk konsistensi (sekitar 32px) */
     font-weight: 700;
-    margin-bottom: 10px; /* jarak ke tagline */
+    margin-bottom: 10px;
     color: #1e1e1e;
     text-align: center;
 }
 
-#contact-us .contact-tagline {
+/* --- PERBAIKAN: Mengganti .ulasan-tagline menjadi .contact-tagline --- */
+#ulasan .contact-tagline { 
     font-size: 16px;
     color: #555;
     text-align: center;
-    margin-bottom: 40px; /* jarak ke form */
+    /* Jarak bawah yang memisahkan dari formulir */
+    margin-bottom: 40px;
 }
 
 .contact-container {
