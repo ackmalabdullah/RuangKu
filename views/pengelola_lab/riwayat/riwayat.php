@@ -67,7 +67,6 @@ $result = mysqli_query($koneksi, $query);
                         <th>Keperluan</th>
                         <th>Peserta</th>
                         <th>Status</th>
-                        <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -101,10 +100,6 @@ $result = mysqli_query($koneksi, $query);
                 <td>{$row['keperluan']}</td>
                 <td>{$row['jumlah_peserta']}</td>
                 <td><span class='badge bg-{$badge} text-capitalize'>{$display_status}</span></td>
-                <td>
-                  <a href='detail.php?id={$row['id_peminjaman']}' class='btn btn-sm btn-info me-1'>Detail</a>
-                  <a href='setujui.php?id={$row['id_peminjaman']}' class='btn btn-sm btn-success me-1'>Setujui</a>
-                  <a href='tolak.php?id={$row['id_peminjaman']}' class='btn btn-sm btn-danger'>Tolak</a>
                 </td>
               </tr>
             ";
