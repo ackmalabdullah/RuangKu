@@ -1,0 +1,53 @@
+/*
+ * File: assets/css/dashboard.css
+ * Styling khusus untuk halaman dashboard (dashboard_statistik.php)
+ */
+
+/* 1. CSS untuk Memberi Jarak dari Navbar yang FIXED/Absolute */
+.header-spacer {
+    /* Tinggi total header (padding .header: 20px + padding .container: 10px + logo: 55px + padding .container: 10px) 
+       adalah 95px. Nilai 120px ini sudah AMAN untuk mendorong konten ke bawah. */
+    height: 120px;
+    width: 100%;
+}
+
+/* 2. Wrapper Iframe (Responsif) */
+.dashboard-container {
+    /* Memastikan container menggunakan seluruh lebar body */
+    max-width: 100%;
+    margin: 0;
+    padding: 0 20px 50px 20px; /* Padding sisi dan bawah untuk estetika */
+
+    /* Mengatur rasio aspek (16:9) agar iframe responsif */
+    position: relative;
+    padding-bottom: 56.25%; /* (9/16) * 100% = 56.25% */
+    height: 0;
+    overflow: hidden;
+}
+
+/* 3. Iframe itu sendiri (HARUS DILENGKAPI) */
+.dashboard-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none; /* Opsional: Menghilangkan border default iframe */
+}
+
+
+/* Opsional: Jika Anda ingin memberikan styling khusus pada seluruh halaman dashboard */
+body.dashboard-page {
+    /* Contoh BG Warna Solid */
+    background-color: #f4f4f4; /* Warna abu-abu muda */
+    
+    /* ATAU Contoh BG dengan Gambar */
+    /* background-image: url('URL_GAMBAR_BG_ANDA'); */
+    /* background-size: cover; */
+    /* background-repeat: no-repeat; */
+}
+
+/* Jika Anda tidak ingin BG pada body, tapi pada wrapper konten utama */
+.dashboard-page-content {
+    background-color: #ffffff; /* Latar belakang putih untuk konten utama */
+}
