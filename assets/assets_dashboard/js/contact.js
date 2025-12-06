@@ -1,22 +1,21 @@
 function kirimWA() {
-    let nama = document.getElementById("nama").value;
-    let pesan = document.getElementById("pesan").value;
+    let nama = document.getElementById("nama").value.trim();
+    let pesan = document.getElementById("pesan").value.trim();
 
     if (!nama || !pesan) {
         alert("Harap isi semua field!");
         return;
     }
 
-    let noWa = "6281234567890";
+    let noWa = "6281233884767"; // nomor tujuan tanpa + dan tanpa 0
 
-    // Buat teks lengkap dulu
-    let text = `Halo Admin RuangKu
-Nama: ${nama}
-Pesan: ${pesan}`;
+    let text =
+        "Halo Admin RuangKu%0A" +
+        "Nama: " + nama + "%0A" +
+        "Kritik/Saran: " + pesan;
 
-    // Encode seluruh teks
-    let encodedText = encodeURIComponent(text);
+    // FORMAT YANG BENAR
+    let url = "https://api.whatsapp.com/send?phone=" + noWa + "&text=" + text;
 
-    // Buka WhatsApp
-    window.open(`https://wa.me/${noWa}?text=${encodedText}`, "_blank");
+    window.open(url, "_blank");
 }
