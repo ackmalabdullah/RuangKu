@@ -88,7 +88,7 @@ $form_title = $id_ruangan ? "Edit Data Ruangan: " . htmlspecialchars($ruangan_da
                         <?php endif; ?>
 
                         <div class="mb-3">
-                            <label class="form-label" for="nama_ruangan">Nama Ruangan/Lab</label>
+                            <label class="form-label" for="nama_ruangan">Nama Ruangan</label>
                             <input type="text" 
                                 class="form-control" 
                                 id="nama_ruangan" 

@@ -1,449 +1,292 @@
 <?php
-// ---------------------------------------------------------
-// DATA AWAL DARI DATABASE (Variabel Awal Anda)
-// Catatan: Variabel-variabel ini akan di-overwrite oleh hasil query DB di bawah.
-// ---------------------------------------------------------
-$nama_user = $dataUser['nama'] ?? "";
-$nim_user = $dataUser['nim'] ?? "";
-$sks_terdaftar = $jumlahSKS ?? 0;
-// ---------------------------------------------------------
-
 $required_role = 'mahasiswa';
-require '../../../partials/mahasiswa/header.php'; // ASUMSI: Koneksi DB ($pdo) sudah tersedia di sini
+require '../../../partials/mahasiswa/header.php';
 require '../../../partials/mahasiswa/sidebar.php';
 require '../../../partials/mahasiswa/navbar.php';
 
+$nama_user    = $_SESSION['nama'] ?? 'Mahasiswa';
+$id_mahasiswa = $_SESSION['id_mahasiswa'] ?? 0;
 
-// =========================================================
-//  QUERY DATABASE UNTUK PEMINJAMAN RUANGAN (db_pinrulab)
-// =========================================================
+$conn = new mysqli("localhost", "root", "", "db_pinrulab");
+if ($conn->connect_error) die("Koneksi gagal: " . $conn->connect_error);
 
-// Ambil ID Mahasiswa yang sedang login
-$id_mahasiswa_login = $dataUser['id'] ?? 0;
+// === STATISTIK ===
+$stmt = $conn->prepare("SELECT COUNT(*) FROM peminjaman WHERE mahasiswa_id = ? AND status = 'disetujui' AND tanggal_pinjam >= CURDATE()");
+$stmt->bind_param("i", $id_mahasiswa); $stmt->execute();
+$peminjaman_aktif = $stmt->get_result()->fetch_row()[0] ?? 0; $stmt->close();
 
-// Inisialisasi variabel untuk menghindari error jika query gagal
-$peminjaman_aktif = 0;
-$peminjaman_ditolak = 0;
-$peminjaman_menunggu = 0;
-$riwayat_peminjaman_terakhir = [];
-$statistik_peminjaman_bulan = [];
-$ruangan_favorit = [];
-$sks_terdaftar = $jumlahSKS ?? 0;
+$stmt = $conn->prepare("SELECT COUNT(*) FROM peminjaman WHERE mahasiswa_id = ? AND status = 'menunggu'");
+$stmt->bind_param("i", $id_mahasiswa); $stmt->execute();
+$peminjaman_menunggu = $stmt->get_result()->fetch_row()[0] ?? 0; $stmt->close();
 
-if (isset($pdo) && $pdo instanceof PDO && $id_mahasiswa_login > 0) {
+$stmt = $conn->prepare("SELECT COUNT(*) FROM peminjaman WHERE mahasiswa_id = ? AND (status = 'ditolak' OR status = 'dibatalkan')");
+$stmt->bind_param("i", $id_mahasiswa); $stmt->execute();
+$peminjaman_ditolak = $stmt->get_result()->fetch_row()[0] ?? 0; $stmt->close();
 
-    $stmtAktif = $pdo->prepare("
-    SELECT COUNT(*) 
-    FROM peminjaman 
-    WHERE mahasiswa_id = ? 
-      AND status = 'disetujui' 
-      AND tanggal_pinjam >= CURDATE()
-");
-    $stmtAktif->execute([$id_mahasiswa_login]);
-    $peminjaman_aktif = $stmtAktif->fetchColumn();
+// === RIWAYAT ===
+$stmt = $conn->prepare("SELECT p.tanggal_pinjam, p.jam_mulai, p.jam_selesai, p.keperluan, p.status, r.nama_ruangan 
+                        FROM peminjaman p 
+                        LEFT JOIN ruangan r ON p.ruangan_id = r.id_ruangan 
+                        WHERE p.mahasiswa_id = ? 
+                        ORDER BY p.created_at DESC LIMIT 6");
+$stmt->bind_param("i", $id_mahasiswa); $stmt->execute();
+$riwayat = $stmt->get_result()->fetch_all(MYSQLI_ASSOC); $stmt->close();
 
-
-    $stmtDitolak = $pdo->prepare("
-    SELECT COUNT(*) 
-    FROM peminjaman 
-    WHERE mahasiswa_id = ? 
-      AND (status = 'ditolak' OR status = 'dibatalkan')
-");
-    $stmtDitolak->execute([$id_mahasiswa_login]);
-    $peminjaman_ditolak = $stmtDitolak->fetchColumn();
-
-
-    $stmtMenunggu = $pdo->prepare("
-    SELECT COUNT(*) 
-    FROM peminjaman 
-    WHERE mahasiswa_id = ? 
-      AND status = 'menunggu'
-");
-    $stmtMenunggu->execute([$id_mahasiswa_login]);
-    $peminjaman_menunggu = $stmtMenunggu->fetchColumn();
-
-
-    $sqlRiwayat = "
-    SELECT 
-        p.id_peminjaman,
-        p.tanggal_pinjam, 
-        p.status,
-        p.jam_mulai,
-        p.jam_selesai,
-        p.keperluan,
-        r.nama_ruangan, 
-        a.nama AS approved_by_nama 
-    FROM peminjaman p
-    LEFT JOIN ruangan r ON p.ruangan_id = r.id_ruangan
-    LEFT JOIN user a ON p.approved_by = a.id
-    WHERE p.mahasiswa_id = ?
-    ORDER BY p.id_peminjaman DESC
-    LIMIT 5
-";
-
-
-
-    // 5. Ruangan Favorit (Data untuk Bar Chart/List) - Top 3
-    $sqlFavorit = "
-    SELECT 
-        r.nama_ruangan AS nama, 
-        COUNT(p.id_peminjaman) AS frekuensi
-    FROM peminjaman p
-    JOIN ruangan r ON p.ruangan_id = r.id_ruangan
-    WHERE p.mahasiswa_id = ?
-    GROUP BY r.nama_ruangan
-    ORDER BY frekuensi DESC
-    LIMIT 3
-";
-
-
-
-    // 6. Statistik Tren Bulanan (Data untuk Grafik Garis/Line Chart) - 6 Bulan Terakhir
-    // CATATAN: QUERY NYATA HARUS MENGGUNAKAN GROUP BY MONTH DAN YEAR
-    $statistik_peminjaman_bulan = [
-        // Data ini adalah simulasi, ganti dengan hasil query agregasi bulanan
-        ['bulan' => 'Jun', 'total' => 5],
-        ['bulan' => 'Jul', 'total' => 8],
-        ['bulan' => 'Agu', 'total' => 4],
-        ['bulan' => 'Sep', 'total' => 10],
-        ['bulan' => 'Okt', 'total' => 7],
-        ['bulan' => 'Nov', 'total' => 12],
-    ];
-}
-
-// Data Kontak Penting (Statis/Dummy)
-$kontak_penting = [
-    ['nama' => 'Bapak Budi', 'jabatan' => 'Admin Ruangan Lab', 'kontak' => '081234567890'],
-    ['nama' => 'Ibu Wati', 'jabatan' => 'Staff Akademik', 'kontak' => '085098765432'],
-];
+// === FAVORIT ===
+$stmt = $conn->prepare("SELECT r.nama_ruangan, COUNT(*) AS kali 
+                        FROM peminjaman p 
+                        JOIN ruangan r ON p.ruangan_id = r.id_ruangan 
+                        WHERE p.mahasiswa_id = ? 
+                        GROUP BY r.id_ruangan 
+                        ORDER BY kali DESC LIMIT 3");
+$stmt->bind_param("i", $id_mahasiswa); $stmt->execute();
+$favorit = $stmt->get_result()->fetch_all(MYSQLI_ASSOC); $stmt->close();
 ?>
 
-<div class="container-xxl flex-grow-1 container-p-y">
+<!-- PARTICLE BACKGROUND (ringan) -->
+<div id="particles-js" class="position-fixed top-0 start-0 w-100 h-100 opacity-15 pointer-events-none"></div>
 
-    <div class="row">
-        <div class="col-lg-8 mb-4 order-0">
-            <div class="card shadow-sm">
-                <div class="d-flex align-items-end row">
-                    <div class="col-sm-7">
-                        <div class="card-body">
-                            <h2 class="card-title text-primary">
-                                Halo, <?= htmlspecialchars($nama_user); ?>! 👋
-                            </h2>
+<style>
+  :root { --primary: #696cff; --primary-light: #e0e2ff; }
+  body { background: linear-gradient(135deg, #f8f9ff 0%, #eef2ff 100%); overflow-x: hidden; }
+  #particles-js { z-index: 1; }
 
-                            <p class="mb-4">
-                                NIM Anda:
-                                <span class="fw-bold">
-                                    <?= htmlspecialchars($nim_user); ?>
-                                </span>.
-                                Periksa riwayat peminjaman Ruangan/Lab Anda.
-                            </p>
+  .dashboard-wrapper {
+    position: relative;
+    z-index: 2;
+    padding: 2rem 1.5rem;
+    max-width: 1500px;
+    margin: 0 auto;
+  }
 
-                            <a href="peminjaman.php" class="btn btn-primary btn-sm">
-                                Lihat Peminjaman Aktif
-                            </a>
-                            <a href="profile.php" class="btn btn-outline-primary btn-sm ms-2">
-                                Atur Profil
-                            </a>
-                        </div>
-                    </div>
+  /* HERO CARD - Glassmorphism */
+  .hero-card {
+    background: rgba(255,255,255,0.38);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 1.8rem;
+    box-shadow: 0 20px 50px rgba(105,108,255,0.22);
+    overflow: hidden;
+  }
 
-                    <div class="col-sm-5 text-center text-sm-left">
-                        <div class="card-body pb-0 px-0 px-md-4">
-                            <img
-                                src="../../../assets/assets_dashboard/assets/img/illustrations/man-with-laptop-light.png"
-                                height="140"
-                                alt="Student Illustration"
-                                data-app-dark-img="illustrations/man-with-laptop-dark.png"
-                                data-app-light-img="illustrations/man-with-laptop-light.png" />
-                        </div>
-                    </div>
-                </div>
+  .circle-decor {
+    position: absolute;
+    width: 380px; height: 380px;
+    background: linear-gradient(135deg, #696cff22, #a3b5ed11);
+    border-radius: 50%;
+    top: -60px; right: -60px;
+    z-index: -1;
+  }
+
+  .stat-card {
+    background: linear-gradient(135deg, #696cff, #8b9eff);
+    border-radius: 1.5rem;
+    padding: 1.8rem;
+    color: white;
+    text-align: center;
+    box-shadow: 0 12px 30px rgba(105,108,255,0.35);
+  }
+
+  .shortcut-card {
+    background: rgba(255,255,255,0.45);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.5);
+    border-radius: 1.5rem;
+    padding: 1.8rem;
+    text-align: center;
+    transition: all 0.4s ease;
+  }
+  .shortcut-card:hover {
+    transform: translateY(-15px) scale(1.05);
+    box-shadow: 0 25px 50px rgba(105,108,255,0.3);
+  }
+  .shortcut-icon {
+    font-size: 3.5rem;
+    background: linear-gradient(135deg, #696cff, #a3b5ed);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.8rem;
+  }
+
+  .data-card {
+    background: white;
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    overflow: hidden;
+  }
+
+  /* RESPONSIVE KHUSUS */
+  @media (max-width: 992px) {
+    .dashboard-wrapper { padding: 1.5rem 1rem; }
+    .hero-card { border-radius: 1.6rem; }
+  }
+  @media (max-width: 576px) {
+    .dashboard-wrapper { padding: 1rem 0.8rem; }
+    .hero-card { border-radius: 1.4rem; }
+    .btn-lg { font-size: 1.1rem !important; padding: 0.9rem 1.5rem !important; }
+    .circle-decor { display: none; }
+  }
+</style>
+
+<div class="dashboard-wrapper">
+
+  <!-- HERO SECTION - 100% RESPONSIVE -->
+  <div class="row g-4 g-xl-5 mb-5 align-items-center">
+    <div class="col-lg-8 order-2 order-lg-1">
+      <div class="card hero-card border-0 position-relative overflow-hidden">
+        <div class="circle-decor d-none d-lg-block"></div>
+        <div class="card-body p-4 p-md-5">
+          <div class="text-center text-lg-start">
+            <h1 class="display-5 display-lg-4 fw-bold text-primary mb-3">
+              Halo, <?= htmlspecialchars($nama_user) ?>!
+            </h1>
+            <p class="fs-5 fs-lg-3 text-dark opacity-85 mb-4">
+              Siap pinjam ruangan favoritmu hari ini?
+            </p>
+            <div class="d-grid d-lg-block">
+              <a href="../peminjaman/ajukan.php" 
+                 class="btn btn-primary btn-lg px-5 py-3 rounded-pill shadow-lg w-100 w-lg-auto">
+                + Ajukan Sekarang
+              </a>
             </div>
+          </div>
         </div>
-
-        <div class="col-lg-4 col-md-4 order-1">
-            <div class="row">
-
-                <div class="col-lg-6 col-md-12 col-6 mb-4">
-                    <div class="card shadow-sm">
-                        <div class="card-body">
-                            <div class="d-flex align-items-start justify-content-between">
-                                <div class="avatar flex-shrink-0">
-                                    <span class="avatar-initial rounded bg-label-success">
-                                        <i class="bx bx-check-shield"></i>
-                                    </span>
-                                </div>
-                            </div>
-                            <span class="fw-semibold d-block mb-1">Disetujui (Aktif)</span>
-                            <h3 class="card-title mb-2"><?= $peminjaman_aktif; ?> Ruangan</h3>
-                            <small class="text-muted">
-                                Siap digunakan
-                            </small>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-6 col-md-12 col-6 mb-4">
-                    <div class="card shadow-sm">
-                        <div class="card-body">
-                            <div class="d-flex align-items-start justify-content-between">
-                                <div class="avatar flex-shrink-0">
-                                    <span class="avatar-initial rounded bg-label-warning">
-                                        <i class="bx bx-hourglass"></i>
-                                    </span>
-                                </div>
-                            </div>
-                            <span class="d-block mb-1">Menunggu</span>
-                            <h3 class="card-title text-nowrap mb-2"><?= $peminjaman_menunggu; ?> Ruangan</h3>
-                            <small class="text-warning fw-semibold">
-                                Permintaan
-                            </small>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-12 col-md-12 col-6 mb-4">
-                    <div class="card shadow-sm">
-                        <div class="card-body">
-                            <div class="d-flex align-items-start justify-content-between">
-                                <div class="avatar flex-shrink-0">
-                                    <span class="avatar-initial rounded bg-label-danger">
-                                        <i class="bx bx-x-circle"></i>
-                                    </span>
-                                </div>
-                            </div>
-                            <span class="d-block mb-1">Permintaan Ditolak</span>
-                            <h5 class="card-title text-nowrap mb-2"><?= $peminjaman_ditolak; ?></h5>
-                            <small class="text-danger fw-semibold">
-                                Ditolak / Dibatalkan
-                            </small>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
+      </div>
     </div>
 
+    <!-- GAMBAR - RESPONSIVE & CANTIK -->
+    <div class="col-lg-4 order-1 order-lg-2 text-center mb-4 mb-lg-0">
+      <div class="position-relative d-inline-block">
+        <img src="../../../assets/assets_dashboard/assets/img/illustrations/man-with-laptop-light.png"
+             class="img-fluid"
+             style="max-height: 340px; max-width: 90%; filter: drop-shadow(0 15px 35px rgba(105,108,255,0.25));"
+             alt="Mahasiswa dengan Laptop">
+      </div>
+    </div>
+  </div>
 
-    <div class="row">
+  <!-- STAT CARD -->
+  <div class="row g-4 mb-5">
+    <div class="col-lg-4 col-md-6">
+      <div class="stat-card h-100">
+        <i class="bx bx-check-circle display-4 mb-2"></i>
+        <h2 class="display-5 fw-bold mb-1"><?= $peminjaman_aktif ?></h2>
+        <p class="mb-0 opacity-90">Aktif Hari Ini</p>
+      </div>
+    </div>
+    <div class="col-lg-4 col-md-6">
+      <div class="stat-card h-100" style="background: linear-gradient(135deg, #ffab00, #ffcd39);">
+        <i class="bx bx-time-five display-4 mb-2"></i>
+        <h2 class="display-5 fw-bold mb-1"><?= $peminjaman_menunggu ?></h2>
+        <p class="mb-0 opacity-90">Menunggu</p>
+      </div>
+    </div>
+    <div class="col-lg-4 col-md-6">
+      <div class="stat-card h-100" style="background: linear-gradient(135deg, #ff3e1d, #ff6b6b);">
+        <i class="bx bx-x-circle display-4 mb-2"></i>
+        <h2 class="display-5 fw-bold mb-1"><?= $peminjaman_ditolak ?></h2>
+        <p class="mb-0 opacity-90">Ditolak</p>
+      </div>
+    </div>
+  </div>
 
-        <div class="col-12 col-lg-8 mb-4">
-            <div class="card shadow-sm h-100">
-                <h5 class="card-header">Statistik Peminjaman Ruangan (6 Bulan Terakhir)</h5>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-7 border-end p-4">
-                            <h6>Tren Jumlah Peminjaman Bulanan</h6>
+  <!-- SHORTCUT MENU -->
+  <div class="row g-4 mb-5">
+    <?php 
+    $menus = [
+      ['link' => '../peminjaman/peminjaman.php', 'icon' => 'bx-home-smile', 'text' => 'Cari Ruangan'],
+      ['link' => '../peminjaman/ajukan.php', 'icon' => 'bx-plus-circle', 'text' => 'Ajukan Pinjam'],
+      ['link' => '../riwayat/riwayat.php', 'icon' => 'bx-history', 'text' => 'Riwayat'],
+      ['link' => '../profile/profile.php', 'icon' => 'bx-user-circle', 'text' => 'Profil Saya'],
+      ['link' => '../profile/ganti_password.php', 'icon' => 'bx-lock-alt', 'text' => 'Ganti Password']
+    ];
+    foreach($menus as $m): ?>
+      <div class="col-6 col-md-4 col-lg">
+        <a href="<?= $m['link'] ?>" class="text-decoration-none">
+          <div class="card shortcut-card h-100">
+            <i class="bx <?= $m['icon'] ?> shortcut-icon"></i>
+            <h6 class="mb-0 text-dark fw-bold"><?= $m['text'] ?></h6>
+          </div>
+        </a>
+      </div>
+    <?php endforeach; ?>
+  </div>
 
-                            <div class="p-4 text-center border rounded">
-                                <i class="bx bx-line-chart-down text-xl me-2 text-primary"></i>
-                                **GRAFIK GARIS (Line Chart)** akan dimuat di sini.
-                                <br>
-                                Data PHP untuk Grafik:
-                                <pre style="font-size: 0.75rem;">
-                                    <?php
-                                    // Data ini siap digunakan oleh library Chart.js, misalnya:
-                                    $labels = array_column($statistik_peminjaman_bulan, 'bulan');
-                                    $data = array_column($statistik_peminjaman_bulan, 'total');
-                                    echo "Labels: " . json_encode($labels) . "\n";
-                                    echo "Data: " . json_encode($data);
-                                    ?>
-                                </pre>
-                            </div>
-                        </div>
-
-                        <div class="col-md-5 p-4">
-                            <h6>Top 3 Ruangan Paling Sering Dipinjam</h6>
-                            <ul class="p-0 m-0 mt-3">
-                                <?php
-                                $bg_class = ['primary', 'info', 'warning'];
-                                if (!empty($ruangan_favorit)):
-                                    foreach ($ruangan_favorit as $index => $ruangan):
-                                        $color = $bg_class[$index % count($bg_class)];
-                                        $icon_name = ($index == 0) ? 'chalkboard' : (($index == 1) ? 'laptop' : 'users');
-                                ?>
-                                        <li class="d-flex mb-3 pb-1">
-                                            <div class="avatar flex-shrink-0 me-3">
-                                                <span class="avatar-initial rounded bg-label-<?= $color; ?>">
-                                                    <i class="bx bx-<?= $icon_name; ?>"></i>
-                                                </span>
-                                            </div>
-                                            <div class="d-flex w-100 justify-content-between">
-                                                <div>
-                                                    <h6 class="mb-0"><?= htmlspecialchars($ruangan['nama']); ?></h6>
-                                                    <small class="text-muted">Total: **<?= $ruangan['frekuensi']; ?>** kali</small>
-                                                </div>
-                                                <span class="badge bg-label-<?= $color; ?>">
-                                                    #<?= $index + 1; ?>
-                                                </span>
-                                            </div>
-                                        </li>
-                                    <?php endforeach;
-                                else: ?>
-                                    <p class="text-muted text-center py-3">Data ruangan favorit belum tersedia.</p>
-                                <?php endif; ?>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  <!-- RIWAYAT + FAVORIT -->
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <div class="card data-card">
+        <div class="card-header bg-transparent border-0 pt-4 px-4">
+          <h5 class="fw-bold text-primary mb-0">Riwayat Terakhir</h5>
         </div>
-
-        <div class="col-12 col-md-8 col-lg-4">
-            <div class="row">
-
-                <div class="col-6 mb-4">
-                    <div class="card shadow-sm">
-                        <div class="card-body">
-                            <div class="d-flex align-items-start justify-content-between">
-                                <div class="avatar flex-shrink-0">
-                                    <span class="avatar-initial rounded bg-label-info">
-                                        <i class="bx bx-chalkboard"></i>
-                                    </span>
-                                </div>
-                            </div>
-                            <span class="d-block mb-1">SKS Terdaftar</span>
-                            <h3 class="card-title"><?= $sks_terdaftar; ?></h3>
-                            <small class="text-success">Semester Ganjil</small>
-                        </div>
-                    </div>
+        <div class="card-body p-0">
+          <?php if ($riwayat): ?>
+            <?php foreach ($riwayat as $i => $r): ?>
+              <div class="p-4 <?= $i < count($riwayat)-1 ? 'border-bottom' : '' ?>">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div>
+                    <h6 class="fw-bold mb-1"><?= htmlspecialchars($r['nama_ruangan'] ?? 'Ruangan Tidak Diketahui') ?></h6>
+                    <small class="text-muted">
+                      <?= date('d M Y', strtotime($r['tanggal_pinjam'])) ?> • 
+                      <?= substr($r['jam_mulai'],0,5) ?> - <?= substr($r['jam_selesai'],0,5) ?>
+                    </small>
+                    <p class="mb-0 mt-1 small text-muted">Keperluan: <?= htmlspecialchars($r['keperluan']) ?></p>
+                  </div>
+                  <span class="badge rounded-pill px-3 py-2 <?= $r['status']=='disetujui' ? 'bg-success' : ($r['status']=='menunggu' ? 'bg-warning text-dark' : 'bg-danger') ?>">
+                    <?= ucfirst($r['status']) ?>
+                  </span>
                 </div>
-
-                <div class="col-6 mb-4">
-                    <div class="card shadow-sm">
-                        <div class="card-body">
-                            <div class="d-flex align-items-start justify-content-between">
-                                <div class="avatar flex-shrink-0">
-                                    <span class="avatar-initial rounded bg-label-warning">
-                                        <i class="bx bx-key"></i>
-                                    </span>
-                                </div>
-                            </div>
-                            <span class="d-block mb-1">Keamanan Akun</span>
-                            <a href="ganti_password.php" class="btn btn-warning btn-sm mt-2 w-100">
-                                Ganti Password
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
+              </div>
+            <?php endforeach; ?>
+          <?php else: ?>
+            <div class="text-center py-5 text-muted">
+              <i class="bx bx-calendar-x display-1 opacity-20"></i>
+              <p class="mt-3">Belum ada riwayat peminjaman</p>
             </div>
+          <?php endif; ?>
         </div>
-
+      </div>
     </div>
 
-
-    <div class="row">
-
-        <div class="col-md-6 col-lg-6 mb-4">
-            <div class="card shadow-sm h-100">
-                <div class="card-header">
-                    <h5 class="m-0">5 Riwayat Peminjaman Ruangan Terakhir</h5>
-                    <small class="text-muted">Status permintaan terbaru Anda</small>
-                </div>
-
-                <div class="card-body">
-                    <?php if (!empty($riwayat_peminjaman_terakhir)): ?>
-                        <ul class="p-0 m-0">
-                            <?php foreach ($riwayat_peminjaman_terakhir as $item):
-                                // Menentukan warna badge berdasarkan kolom `status` ENUM
-                                $badge_color = 'secondary';
-                                if ($item['status'] == 'disetujui') {
-                                    $badge_color = 'success';
-                                } elseif ($item['status'] == 'ditolak') {
-                                    $badge_color = 'danger';
-                                } elseif ($item['status'] == 'menunggu') {
-                                    $badge_color = 'warning';
-                                } elseif ($item['status'] == 'dibatalkan') {
-                                    $badge_color = 'secondary';
-                                } else {
-                                    $badge_color = 'info'; // Status 'selesai'
-                                }
-                            ?>
-                                <li class="d-flex mb-4 pb-1">
-                                    <div class="avatar flex-shrink-0 me-3">
-                                        <span class="avatar-initial rounded bg-label-<?= $badge_color; ?>">
-                                            <i class="bx bx-calendar-check"></i>
-                                        </span>
-                                    </div>
-
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <div>
-                                            <h6 class="mb-0">
-                                                <?= htmlspecialchars($item['nama_ruangan'] ?? 'Ruangan Tidak Ditemukan'); ?>
-                                            </h6>
-                                            <small class="text-muted d-block">
-                                                <?= $item['tanggal_pinjam']; ?>, Pukul **<?= $item['jam_mulai']; ?>** - **<?= $item['jam_selesai']; ?>**
-                                            </small>
-                                            <small class="text-truncate d-block">
-                                                Keperluan: *<?= htmlspecialchars($item['keperluan'] ?? '-'); ?>*
-                                            </small>
-                                        </div>
-
-                                        <div class="text-end">
-                                            <span class="badge bg-label-<?= $badge_color; ?> mb-1">
-                                                <?= ucfirst($item['status']); ?>
-                                            </span>
-                                            <small class="text-muted d-block" style="font-size: 0.75rem;">
-                                                Oleh: <?= htmlspecialchars($item['approved_by_nama'] ?? 'N/A'); ?>
-                                            </small>
-                                        </div>
-                                    </div>
-                                </li>
-                            <?php endforeach; ?>
-                        </ul>
-                    <?php else: ?>
-                        <p class="text-muted text-center py-3">Tidak ada riwayat peminjaman.</p>
-                    <?php endif; ?>
-
-                    <div class="text-center mt-3">
-                        <a href="riwayat_peminjaman.php" class="btn btn-outline-secondary btn-sm">
-                            Lihat Semua Riwayat
-                        </a>
-                    </div>
-
-                </div>
-            </div>
+    <div class="col-lg-4">
+      <div class="card data-card h-100">
+        <div class="card-header bg-transparent border-0 pt-4 px-4">
+          <h5 class="fw-bold text-primary mb-0">Ruangan Favorit</h5>
         </div>
-
-        <div class="col-md-6 col-lg-6 mb-4">
-            <div class="card shadow-sm h-100">
-                <div class="card-header">
-                    <h5 class="m-0">Kontak Penting</h5>
-                    <small class="text-muted">Hubungi untuk masalah peminjaman/akun</small>
-                </div>
-                <div class="card-body">
-
-                    <?php if (!empty($kontak_penting)): ?>
-                        <ul class="p-0 m-0">
-                            <?php foreach ($kontak_penting as $kontak): ?>
-                                <li class="d-flex mb-4 pb-1">
-                                    <div class="avatar flex-shrink-0 me-3">
-                                        <span class="avatar-initial rounded bg-label-primary">
-                                            <i class="bx bx-user"></i>
-                                        </span>
-                                    </div>
-
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <div>
-                                            <small class="text-muted d-block"><?= $kontak['jabatan']; ?></small>
-                                            <h6 class="mb-0"><?= $kontak['nama']; ?></h6>
-                                        </div>
-                                        <a href="tel:<?= $kontak['kontak']; ?>" class="badge bg-label-primary align-self-center">Hubungi</a>
-                                    </div>
-                                </li>
-                            <?php endforeach; ?>
-                        </ul>
-                    <?php else: ?>
-                        <p class="text-muted text-center py-3">Belum ada kontak penting tersedia.</p>
-                    <?php endif; ?>
-
-                </div>
-            </div>
+        <div class="card-body">
+          <?php if ($favorit): ?>
+            <ol class="list-group list-group-numbered">
+              <?php foreach ($favorit as $f): ?>
+                <li class="list-group-item d-flex justify-content-between align-items-center py-3">
+                  <?= htmlspecialchars($f['nama_ruangan']) ?>
+                  <span class="badge bg-primary rounded-pill"><?= $f['kali'] ?>×</span>
+                </li>
+              <?php endforeach; ?>
+            </ol>
+          <?php else: ?>
+            <p class="text-center text-muted py-5 mb-0">Belum ada favorit</p>
+          <?php endif; ?>
         </div>
-
+      </div>
     </div>
+  </div>
 </div>
+
+<!-- PARTICLES JS -->
+<script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+<script>
+  particlesJS("particles-js", {
+    particles: {
+      number: { value: 50, density: { enable: true, value_area: 800 } },
+      color: { value: "#696cff" },
+      opacity: { value: 0.3, random: true },
+      size: { value: 3, random: true },
+      move: { enable: true, speed: 1.2 }
+    },
+    interactivity: { events: { onhover: { enable: true, mode: "repulse" } } },
+    retina_detect: true
+  });
+</script>
 
 <?php require '../../../partials/mahasiswa/footer.php'; ?>

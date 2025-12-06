@@ -53,14 +53,6 @@
         <div id="passwordError" class="error-message">Password tidak boleh kosong.</div>
       </div>
 
-      <div class="options">
-        <div class="remember-me">
-          <input type="checkbox" id="remember" name="remember">
-          <label for="remember">Ingat Saya</label>
-        </div>
-        <a href="lupa_password_mahasiswa.php" class="forgot-password">Lupa Password?</a>
-      </div>
-
       <button type="submit" class="login-button">Login</button>
 
       <div class="support-link">
