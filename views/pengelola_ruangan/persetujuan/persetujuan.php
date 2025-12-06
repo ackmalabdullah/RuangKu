@@ -57,8 +57,8 @@ if (isset($_SESSION['alert'])):
 <?php endif; ?>
 
 <div class="container my-5">
-    <h2 class="fw-bold mb-4 text-primary">✅ Persetujuan Peminjaman Ruangan (Tahap Final)</h2>
-    <p class="text-muted">Daftar permintaan peminjaman ruangan yang **sudah diverifikasi Jurusan** dan memerlukan persetujuan jadwal.</p>
+    <h2 class="fw-bold mb-4 text-primary">✅ Persetujuan Peminjaman Ruangan </h2>
+    <p class="text-muted">Daftar permintaan peminjaman ruangan yang sudah diverifikasi Jurusan dan memerlukan persetujuan jadwal.</p>
     
     <div class="card shadow-sm">
         <div class="card-body">

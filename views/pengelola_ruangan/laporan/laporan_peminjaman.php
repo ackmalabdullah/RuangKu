@@ -21,7 +21,7 @@ $query = mysqli_query($conn, "
 <div class="container-xxl flex-grow-1 container-p-y">
 
   <div class="card">
-    <h5 class="card-header">Laporan Peminjaman Laboratorium</h5>
+    <h5 class="card-header">Laporan Peminjaman Ruangan</h5>
     <div class="card-body">
 
       <div class="mb-3">

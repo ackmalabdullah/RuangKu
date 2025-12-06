@@ -11,6 +11,20 @@ require $koneksi_path;
 $database = new Database();
 $conn = $database->conn;
 
+$id_user = $_SESSION['id_user'] ?? null;
+
+$user_nama = 'Admin';
+$user_email = '-';
+
+if ($id_user) {
+    $q = mysqli_query($conn, "SELECT nama, email FROM users WHERE id_user = '$id_user' LIMIT 1");
+    if ($q && mysqli_num_rows($q) == 1) {
+        $u = mysqli_fetch_assoc($q);
+        $user_nama = $u['nama'];
+        $user_email = $u['email'];
+    }
+}
+
 if (!$conn) {
     die('ERROR: Koneksi database gagal!');
 }
@@ -39,9 +53,6 @@ if (mysqli_num_rows($query) == 0) {
         ';
     }
 }
-
-$user_nama = $_SESSION['nama_user'] ?? 'Admin';
-$user_email = $_SESSION['email'] ?? '';
 
 ?>
 <!DOCTYPE html>
