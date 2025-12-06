@@ -145,14 +145,7 @@ function isActive($menuPageName)
           </a>
         </li>
 
-        <li class="menu-item <?php echo isActive('laporan.php'); ?>">
-          <a href="laporan.php" class="menu-link">
-            <i class="menu-icon tf-icons bx bx-file-blank"></i>
-            <div>Laporan</div>
-          </a>
-        </li>
-
-        <li class="menu-header small text-uppercase">
+         <li class="menu-header small text-uppercase">
           <span class="menu-header-text">Logout</span>
         </li>
 
@@ -226,7 +219,7 @@ function isActive($menuPageName)
             <div>Persetujuan</div>
           </a>
         </li>
-        <li class="menu-item <?php echo isActive('riwayat-ruangan.php'); ?>">
+        <li class="menu-item <?php echo isActive('riwayat.php'); ?>">
           <a href="../riwayat/riwayat.php" class="menu-link">
             <i class="menu-icon tf-icons bx bx-book-content"></i>
             <div>Riwayat Peminjaman Lab</div>

@@ -74,7 +74,7 @@ switch ($aksi) {
 
             $_SESSION['pesan'] = [
                 'tipe' => 'success',
-                'isi'  => "Ruangan <strong>$nama_ruangan</strong> berhasil ditambahkan!"
+                'isi'  => "Ruangan $nama_ruangan berhasil ditambahkan!"
             ];
         } else {
             // Hapus gambar jika gagal insert
@@ -141,7 +141,7 @@ switch ($aksi) {
             simpanFasilitasRuangan($koneksi, $id_ruangan, $_POST);
             $_SESSION['pesan'] = [
                 'tipe' => 'success',
-                'isi'  => "Ruangan <strong>$nama_ruangan</strong> berhasil diperbarui!"
+                'isi'  => "Ruangan $nama_ruangan berhasil diperbarui!"
             ];
         } else {
             // Rollback gambar baru jika gagal
