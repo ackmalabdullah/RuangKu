@@ -55,8 +55,7 @@ $prodi = $koneksi->query("SELECT id_prodi, nama_prodi FROM prodi");
 <div class="container-xxl flex-grow-1 container-p-y">
   <div class="row">
     <div class="col-xxl">
-
-
+<?php if (isset($_GET['show_filter'])): ?>
 <!-- FILTER DATA MAHASISWA -->
 <div class="card mb-4">
   <div class="card-header">
@@ -93,7 +92,7 @@ $prodi = $koneksi->query("SELECT id_prodi, nama_prodi FROM prodi");
                value="<?= isset($_GET['filter_angkatan']) ? $_GET['filter_angkatan'] : ''; ?>">
       </div>
 
-      <!-- TOMBBOL -->
+      <!-- TOMBOL -->
       <div class="col-md-4 d-flex align-items-end">
         <button class="btn btn-primary w-100" type="submit">
           <i class="bx bx-filter-alt me-1"></i> Filter
@@ -103,6 +102,8 @@ $prodi = $koneksi->query("SELECT id_prodi, nama_prodi FROM prodi");
     </form>
   </div>
 </div>
+<?php endif; ?>
+
 
 
       <div class="card mb-4">
